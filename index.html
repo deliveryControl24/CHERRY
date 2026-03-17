@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Cherry v3.0 — by berry</title>
+<meta name="description" content="Sistema POS Cherry v3.0 by berry">
+<meta name="theme-color" content="#c0132c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cherry POS">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c0132c'/><text y='.9em' font-size='80'>🍒</text></svg>">
+<link id="pwaManifest" rel="manifest" href="">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
@@ -24,6 +32,17 @@
   --font:'Outfit',sans-serif; --mono:'DM Mono',monospace;
   --sw:240px; --th:60px;
 }
+/* ── LIGHT MODE ── */
+[data-theme="light"] {
+  --bg:#f5f0f0; --surface:#ffffff; --surface2:#f8f3f3; --surface3:#efe8e8;
+  --border:#e0d0d0; --text:#1a0810; --text2:#7a5060; --text3:#b09898;
+  --shadow:0 8px 32px rgba(0,0,0,.12);
+  --shadow-ch:0 4px 20px rgba(192,19,44,.2);
+}
+[data-theme="light"] body::before{opacity:.1}
+[data-theme="light"] .topbar{background:#fff;border-color:#e8d8d8}
+[data-theme="light"] .sidebar{background:#fff;border-color:#e8d8d8}
+[data-theme="light"] ::-webkit-scrollbar-thumb{background:#d0b8b8}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:16px}
 body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
@@ -321,6 +340,27 @@ tr:hover td{background:rgba(255,255,255,.015)}
 .vuelto-ok{color:var(--green);font-weight:800;font-size:15px}
 .vuelto-err{color:var(--danger);font-weight:700;font-size:13px}
 
+/* BALANCE CHART */
+.bal-bar-wrap{display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 4px}
+.bal-bar-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:3px}
+.bal-bar-label{font-size:10px;color:var(--text3);font-weight:600;white-space:nowrap}
+.bal-bar-bars{display:flex;gap:3px;align-items:flex-end;height:80px;width:100%}
+.bal-bar-ing{background:linear-gradient(180deg,var(--green),rgba(45,216,138,.4));border-radius:4px 4px 0 0;flex:1;min-height:2px;transition:height .4s ease}
+.bal-bar-eg{background:linear-gradient(180deg,var(--danger),rgba(255,68,102,.4));border-radius:4px 4px 0 0;flex:1;min-height:2px;transition:height .4s ease}
+.bal-legend{display:flex;gap:16px;margin-top:10px;font-size:12px}
+.bal-legend span{display:flex;align-items:center;gap:5px;color:var(--text2)}
+.bal-legend .dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* GASTO HIST ROW */
+.hist-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(58,34,40,.4)}
+.hist-row:last-child{border-bottom:none}
+.hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* DATE NAV */
+.date-btn{padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:var(--surface2);color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.date-btn.active{background:var(--cherry);border-color:var(--cherry);color:white}
+.date-btn:hover{border-color:var(--cherry-border);color:var(--pink)}
+
 /* PROFIT */
 .profit-pos{color:var(--green)}
 .profit-neg{color:var(--danger)}
@@ -382,6 +422,46 @@ tr:hover td{background:rgba(255,255,255,.015)}
   .report-period-tabs .rp-tab{padding:7px 12px;font-size:12px}
 }
 @media(max-width:380px){.stat-grid{grid-template-columns:1fr}.products-grid{grid-template-columns:repeat(3,1fr)}}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle{background:none;border:none;font-size:18px;cursor:pointer;padding:6px;border-radius:var(--r-sm);transition:all .2s}
+.theme-toggle:hover{background:var(--surface2)}
+
+/* ── TICKET 80MM ── */
+@media print{
+  .ticket-print-area{display:block!important}
+  body>*:not(#ticketPrintWrap){display:none!important}
+  #ticketPrintWrap{display:block!important;position:fixed;inset:0;background:white;z-index:9999;padding:0}
+}
+.ticket{font-family:'Courier New',monospace;font-size:12px;width:100%;max-width:300px;margin:0 auto;background:white;color:#111;padding:12px 8px}
+.ticket-center{text-align:center}
+.ticket-divider{border-top:1px dashed #999;margin:6px 0}
+.ticket-bold{font-weight:bold}
+.ticket-row{display:flex;justify-content:space-between;padding:2px 0;font-size:11.5px}
+.ticket-total{display:flex;justify-content:space-between;font-size:14px;font-weight:bold;padding:4px 0;border-top:2px solid #111}
+
+/* ── CALCULADORA ── */
+.quick-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--text2)}
+.quick-btn:hover{border-color:var(--cherry);color:var(--cherry-glow);background:var(--cherry-soft)}
+
+/* ── STOCK ALERT ── */
+.stock-alert-card{background:var(--surface);border:1px solid rgba(255,201,77,.3);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);animation:slideIn .3s ease;margin-bottom:8px}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+.stock-alert-title{font-size:12px;font-weight:800;color:var(--warn);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.stock-alert-item{display:flex;justify-content:space-between;padding:4px 0;font-size:12px;border-bottom:1px solid rgba(58,34,40,.3)}
+.stock-alert-item:last-child{border-bottom:none}
+
+/* ── VENTAS POR HORA ── */
+.hora-chart{display:flex;align-items:flex-end;gap:3px;height:80px;padding:0 2px;overflow-x:auto}
+.hora-bar-col{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;min-width:18px}
+.hora-bar{border-radius:3px 3px 0 0;background:linear-gradient(180deg,var(--cherry-glow),var(--cherry-deep));min-width:14px;transition:height .4s ease;cursor:pointer;position:relative}
+.hora-bar:hover::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);padding:3px 7px;border-radius:6px;font-size:11px;white-space:nowrap;z-index:10}
+.hora-lbl{font-size:9px;color:var(--text3);font-weight:600}
+
+/* ── INVOICE CUSTOM STYLES ── */
+.inv-classic{border:2px solid #c0132c}
+.inv-classic th{background:#333!important}
+.inv-minimal th{background:#f0f0f0!important;color:#333!important}
 </style>
 </head>
 <body>
@@ -402,8 +482,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
   <span class="topbar-clock" id="clock">--:--:--</span>
   <div class="btn-group" style="gap:6px">
-    <button class="btn btn-ghost btn-sm" onclick="exportAllData()">💾</button>
-    <button class="btn btn-ghost btn-sm" onclick="openModal('importModal')">📂</button>
+    <button class="btn btn-ghost btn-sm" id="themeBtn" onclick="toggleTheme()" title="Cambiar tema">🌙</button>
+    <button class="btn btn-ghost btn-sm" onclick="openModal('calcModal')" title="Calculadora C$ ↔ USD">💱</button>
+    <button class="btn btn-ghost btn-sm" onclick="exportAllData()" title="Backup">💾</button>
+    <button class="btn btn-ghost btn-sm" onclick="openModal('importModal')" title="Importar">📂</button>
   </div>
 </header>
 
@@ -425,12 +507,13 @@ tr:hover td{background:rgba(255,255,255,.015)}
   <div class="nav-item" data-view="facturas" onclick="switchView('facturas',this)"><span class="nav-icon">🧾</span>Facturas</div>
   <div class="sb-divider"></div>
   <div class="sb-section">Análisis</div>
+  <div class="nav-item" data-view="balance" onclick="switchView('balance',this)"><span class="nav-icon">📈</span>Balance</div>
   <div class="nav-item" data-view="reportes" onclick="switchView('reportes',this)"><span class="nav-icon">📊</span>Reportes</div>
   <div class="nav-item" data-view="clientes" onclick="switchView('clientes',this)"><span class="nav-icon">👥</span>Clientes</div>
   <div class="sb-divider"></div>
   <div class="sb-section">Sistema</div>
   <div class="nav-item" data-view="config" onclick="switchView('config',this)"><span class="nav-icon">⚙️</span>Configuración</div>
-  <div class="sb-footer">🍒 <strong>Cherry v3.0</strong><br>by berry · Nicaragua</div>
+  <div class="sb-footer">🍒 <strong>Cherry v3.0</strong><br>by berry </div>
 </nav>
 
 <!-- MAIN -->
@@ -664,6 +747,10 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <div id="reportRecent"></div>
     </div>
   </div>
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">⏰ Ventas por Hora del Día</div>
+    <div id="reportHoras"></div>
+  </div>
 </div>
 
 <!-- ====== CLIENTES ====== -->
@@ -698,11 +785,24 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <div class="card">
       <div class="card-title">🏪 Empresa</div>
       <div class="form-group" style="margin-bottom:10px"><label>Nombre del negocio</label><input class="input" id="cNombre" placeholder="Mi Negocio"></div>
-      <div class="form-group" style="margin-bottom:10px"><label>RUC / NIT / Cédula</label><input class="input" id="cRFC" placeholder="J0310000012345"></div>
-      <div class="form-group" style="margin-bottom:10px"><label>Dirección</label><input class="input" id="cDir" placeholder="Bo. El Carmen, Managua"></div>
+      <div class="form-group" style="margin-bottom:10px"><label>RUC / NIT <span style="font-weight:400;color:var(--text3)">(opcional)</span></label><input class="input" id="cRFC" placeholder="Opcional"></div>
+      <div class="form-group" style="margin-bottom:10px"><label>Dirección</label><input class="input" id="cDir" placeholder="Tu dirección aquí"></div>
       <div class="form-group" style="margin-bottom:10px"><label>Teléfono</label><input class="input" id="cTel" placeholder="+505 8888 0000" type="tel"></div>
       <div class="form-group" style="margin-bottom:10px"><label>Email</label><input class="input" id="cEmail" type="email" placeholder="ventas@negocio.com"></div>
-      <div class="form-group"><label>Mensaje en facturas</label><input class="input" id="cMsg" placeholder="Gracias por su compra 🍒"></div>
+      <div class="form-group" style="margin-bottom:10px"><label>Mensaje en facturas</label><input class="input" id="cMsg" placeholder="Gracias por su compra 🍒"></div>
+      <div class="form-group"><label>Logo del negocio <span style="font-weight:400;color:var(--text3)">(aparece en facturas)</span></label>
+        <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+          <label for="logoUpload" style="cursor:pointer;background:var(--surface2);border:2px dashed var(--border);border-radius:var(--r-sm);padding:12px 16px;text-align:center;transition:border-color .15s;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);flex:1" onmouseover="this.style.borderColor='var(--cherry)'" onmouseout="this.style.borderColor='var(--border)'">
+            <span style="font-size:20px">🖼️</span> Subir logo (PNG, JPG)
+            <input type="file" id="logoUpload" accept="image/*" style="display:none" onchange="handleLogoUpload(this)">
+          </label>
+          <div id="logoPreview" style="width:60px;height:60px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+            <span id="logoPlaceholder" style="font-size:24px">🍒</span>
+            <img id="logoImg" style="display:none;width:100%;height:100%;object-fit:contain">
+          </div>
+          <button class="btn btn-danger btn-xs" onclick="removeLogo()" id="logoRemoveBtn" style="display:none">✕</button>
+        </div>
+      </div>
     </div>
     <div class="card">
       <div class="card-title">💰 Fiscal & Sistema</div>
@@ -725,12 +825,160 @@ tr:hover td{background:rgba(255,255,255,.015)}
       </div>
     </div>
   </div>
+  <!-- Invoice customization card -->
+  <div class="card" style="margin-top:16px">
+    <div class="card-title">🎨 Personalizar Facturas</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+      <div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Color principal de factura</label>
+          <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+            <input type="color" id="invColor" value="#c0132c" style="width:44px;height:36px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface2);cursor:pointer;padding:2px">
+            <input class="input input-sm" id="invColorHex" value="#c0132c" placeholder="#c0132c" oninput="syncColorHex()" style="flex:1">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Estilo de factura</label>
+          <select class="input input-sm" id="invStyle">
+            <option value="modern">Moderno (con color)</option>
+            <option value="minimal">Minimalista (blanco)</option>
+            <option value="classic">Clásico (con bordes)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Pie de página extra</label>
+          <input class="input input-sm" id="invFooter" placeholder="Ej: No se aceptan devoluciones...">
+        </div>
+      </div>
+      <div>
+        <div class="form-group" style="margin-bottom:10px">
+          <label>Mostrar en factura</label>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;color:var(--text)">
+              <input type="checkbox" id="invShowRUC" checked style="accent-color:var(--cherry)"> Mostrar RUC/NIT
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;color:var(--text)">
+              <input type="checkbox" id="invShowIVA" checked style="accent-color:var(--cherry)"> Desglosar IVA
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:400;color:var(--text)">
+              <input type="checkbox" id="invShowVuelto" checked style="accent-color:var(--cherry)"> Mostrar vuelto/cambio
+            </label>
+          </div>
+        </div>
+        <button class="btn btn-cherry btn-sm" onclick="previewInvoice()" style="margin-top:8px">👁 Vista previa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== BALANCE ====== -->
+<div class="view" id="view-balance">
+  <div class="page-header">
+    <div class="page-title">📈 Balance <small id="balancePeriodLabel">Hoy</small></div>
+    <div class="btn-group">
+      <button class="btn btn-ghost btn-sm" onclick="exportBalanceXLSX()">📊 Excel</button>
+      <button class="btn btn-cherry btn-sm" onclick="openNuevoGasto()">➖ Nuevo Gasto</button>
+    </div>
+  </div>
+
+  <!-- date nav like the screenshot -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px" id="balanceDateNav"></div>
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:120px">
+        <div style="font-size:11px;color:var(--text2);font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Balance</div>
+        <div style="font-size:22px;font-weight:900;font-family:var(--mono)" id="balanceTotal">C$0</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:2">
+        <div style="background:var(--green-soft);border:1px solid rgba(45,216,138,.2);border-radius:var(--r-sm);padding:12px">
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--green);margin-bottom:6px">↗️ Ingresos</div>
+          <div style="font-size:20px;font-weight:800;font-family:var(--mono);color:var(--green)" id="balanceIngresos">C$0</div>
+        </div>
+        <div style="background:var(--danger-soft);border:1px solid rgba(255,68,102,.2);border-radius:var(--r-sm);padding:12px">
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--danger);margin-bottom:6px">↘️ Egresos</div>
+          <div style="font-size:20px;font-weight:800;font-family:var(--mono);color:var(--danger)" id="balanceEgresos">C$0</div>
+        </div>
+      </div>
+    </div>
+    <!-- period selector pills -->
+    <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:2px">
+      <button class="rp-tab active" onclick="setBalancePeriod('day',this)">📅 Día</button>
+      <button class="rp-tab" onclick="setBalancePeriod('week',this)">📅 Semana</button>
+      <button class="rp-tab" onclick="setBalancePeriod('month',this)">📅 Mes</button>
+      <button class="rp-tab" onclick="setBalancePeriod('year',this)">📅 Año</button>
+    </div>
+  </div>
+
+  <!-- stat cards -->
+  <div class="stat-grid" id="balanceStats"></div>
+
+  <!-- ingreso / egreso tabs + list -->
+  <div class="two-col">
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">↗️ Historial de Ingresos</div>
+        <div id="balanceIngList" style="max-height:320px;overflow-y:auto"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-title">↘️ Historial de Egresos</div>
+        <div id="balanceEgList" style="max-height:320px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grafico de barras semanal -->
+  <div class="card" style="margin-bottom:16px">
+    <div class="card-title">📊 Estadística de Ventas vs Gastos</div>
+    <div id="balanceChart" style="padding:8px 0"></div>
+  </div>
+
+  <!-- Top categorías de gasto -->
+  <div class="card">
+    <div class="card-title">🏷️ Gastos por Categoría</div>
+    <div id="gastosChart"></div>
+  </div>
 </div>
 
 </main>
 </div>
 
 <!-- ========== MODALS ========== -->
+
+<!-- GASTO MODAL -->
+<div class="modal-overlay" id="gastoModal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header"><div class="modal-title">➖ Registrar Gasto</div><button class="modal-close" onclick="closeModal('gastoModal')">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="gastoId">
+      <div class="form-grid">
+        <div class="form-group"><label>Descripción *</label><input class="input" id="gastoDesc" placeholder="Ej: Compra de inventario"></div>
+        <div class="form-group"><label>Monto *</label><input class="input" id="gastoMonto" type="number" min="0" step=".01" placeholder="0.00"></div>
+      </div>
+      <div class="form-grid">
+        <div class="form-group"><label>Categoría</label>
+          <select class="input" id="gastoCat">
+            <option>Inventario / Compras</option>
+            <option>Alquiler / Local</option>
+            <option>Salarios</option>
+            <option>Servicios (agua, luz)</option>
+            <option>Transporte</option>
+            <option>Marketing</option>
+            <option>Mantenimiento</option>
+            <option>Otros</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Fecha</label><input class="input" id="gastoFecha" type="date"></div>
+      </div>
+      <div class="form-group"><label>Notas</label><input class="input" id="gastoNotas" placeholder="Detalles adicionales..."></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('gastoModal')">Cancelar</button>
+      <button class="btn btn-cherry" onclick="saveGasto()">💾 Guardar Gasto</button>
+    </div>
+  </div>
+</div>
 
 <!-- ONBOARDING -->
 <div class="modal-overlay" id="onboardingModal" style="z-index:2001">
@@ -739,16 +987,16 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <span class="ob-logo">🍒</span>
       <div class="ob-title"><span>Cherry</span> v3.0</div>
       <div style="font-size:13px;color:var(--text2);margin-top:6px">Sistema POS — Bienvenido/a</div>
-      <div class="ob-badge">✨ by berry · Nicaragua</div>
+      <div class="ob-badge">✨ by berry </div>
     </div>
     <div class="modal-body">
       <div class="ob-hint">Ingresa los datos de tu negocio. Aparecerán en todas tus facturas. Puedes cambiarlos en ⚙️ Configuración.</div>
       <div class="ob-section">🏪 Tu Negocio</div>
       <div class="form-grid" style="margin-bottom:10px">
         <div class="form-group"><label>Nombre del negocio *</label><input class="input" id="ob_nombre" placeholder="Ej: Pulpería La Ceiba"></div>
-        <div class="form-group"><label>RUC / NIT / Cédula</label><input class="input" id="ob_rfc" placeholder="J0310000012345"></div>
+        <div class="form-group"><label>RUC / NIT <span style="font-weight:400;color:var(--text3)">(opcional)</span></label><input class="input" id="ob_rfc" placeholder="Opcional"></div>
       </div>
-      <div class="form-group" style="margin-bottom:10px"><label>Dirección</label><input class="input" id="ob_dir" placeholder="Ej: Bo. El Carmen, Managua"></div>
+      <div class="form-group" style="margin-bottom:10px"><label>Dirección</label><input class="input" id="ob_dir" placeholder="Ej: Tu dirección aquí"></div>
       <div class="form-grid" style="margin-bottom:10px">
         <div class="form-group"><label>Teléfono</label><input class="input" id="ob_tel" placeholder="+505 8888 0000" type="tel"></div>
         <div class="form-group"><label>Email</label><input class="input" id="ob_email" placeholder="ventas@negocio.com" type="email"></div>
@@ -916,6 +1164,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
     <div class="modal-body"><div id="invPreviewWrap"></div></div>
     <div class="modal-footer">
       <button class="btn btn-ghost btn-sm" onclick="printInv()">🖨️ Imprimir</button>
+      <button class="btn btn-warn btn-sm" onclick="showTicketModal()">🖨️ Ticket 80mm</button>
       <button class="btn btn-blue btn-sm" onclick="openEmailFromInvoice()">📧 Email</button>
       <button class="btn btn-green btn-sm" onclick="downloadCurrentXLSX()">📊 Excel</button>
     </div>
@@ -950,7 +1199,7 @@ tr:hover td{background:rgba(255,255,255,.015)}
       <input type="hidden" id="cliId">
       <div class="form-grid">
         <div class="form-group"><label>Nombre *</label><input class="input" id="cliNombre" placeholder="Nombre completo"></div>
-        <div class="form-group"><label>RUC / NIT</label><input class="input" id="cliRFC" placeholder="J0310000012345"></div>
+        <div class="form-group"><label>RUC / NIT <span style="font-weight:400;color:var(--text3)">(opcional)</span></label><input class="input" id="cliRFC" placeholder="Opcional"></div>
       </div>
       <div class="form-grid">
         <div class="form-group"><label>Email</label><input class="input" id="cliEmail" type="email" placeholder="cliente@email.com"></div>
@@ -985,17 +1234,65 @@ tr:hover td{background:rgba(255,255,255,.015)}
   </div>
 </div>
 
+<!-- CALCULADORA C$ ↔ USD -->
+<div class="modal-overlay" id="calcModal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header"><div class="modal-title">💱 Calculadora de Moneda</div><button class="modal-close" onclick="closeModal('calcModal')">✕</button></div>
+    <div class="modal-body">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Tasa de cambio</div>
+        <div style="display:flex;align-items:center;gap:8px;justify-content:center">
+          <span style="font-size:13px;font-weight:600">1 USD =</span>
+          <input class="input input-sm" id="tasaCambio" type="number" value="36.5" step="0.1" min="1" style="width:90px;text-align:center;font-family:var(--mono);font-weight:700" oninput="calcMoneda()">
+          <span style="font-size:13px;font-weight:600">C$</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:16px">
+        <div class="form-group">
+          <label style="color:var(--green)">💵 USD</label>
+          <input class="input" id="calcUSD" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcFromUSD()" style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--green)">
+        </div>
+        <div style="text-align:center;font-size:20px;padding-top:20px">⇄</div>
+        <div class="form-group">
+          <label style="color:var(--cherry-glow)">🇳🇮 C$</label>
+          <input class="input" id="calcNIO" type="number" min="0" step="0.01" placeholder="0.00" oninput="calcFromNIO()" style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--cherry-glow)">
+        </div>
+      </div>
+      <!-- quick amounts -->
+      <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:8px">Conversiones rápidas</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="quickConv"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKET 80MM MODAL -->
+<div class="modal-overlay" id="ticketModal">
+  <div class="modal" style="max-width:340px">
+    <div class="modal-header"><div class="modal-title">🖨️ Ticket de Venta</div><button class="modal-close" onclick="closeModal('ticketModal')">✕</button></div>
+    <div class="modal-body" style="padding:12px">
+      <div id="ticketPreview"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('ticketModal')">Cerrar</button>
+      <button class="btn btn-cherry" onclick="printTicket()">🖨️ Imprimir Ticket</button>
+    </div>
+  </div>
+</div>
+
+<!-- STOCK ALERT PANEL (slide-in) -->
+<div id="stockAlertPanel" style="position:fixed;top:70px;right:16px;z-index:300;max-width:300px;display:none"></div>
+
 <div class="toast-box" id="toastBox"></div>
 
 <script>
 /* ============================================================
-   CHERRY v3.0 by berry — POS Completo Nicaragua
+   CHERRY v3.0 by berry — POS Completo
    Caja, Créditos, Reportes, IVA, Vuelto, Cierre de turno
    ============================================================ */
 
 // ═══════════════════════ STATE ═══════════════════════════════
 let S = {
-  productos:[],kardex:[],facturas:[],clientes:[],creditos:[],
+  productos:[],kardex:[],facturas:[],clientes:[],creditos:[],gastos:[],
   caja:{
     abierta:false, cajero:'', fondoInicial:0, apertura:null,
     cierres:[]
@@ -1003,13 +1300,17 @@ let S = {
   cfg:{
     nombre:'',rfc:'',dir:'',tel:'',email:'',
     msg:'Gracias por su compra 🍒',
-    iva:15,moneda:'C$',stockMin:5,facNum:1,onboardingDone:false
+    iva:15,moneda:'C$',stockMin:5,facNum:1,onboardingDone:false,logo:null,
+    invColor:'#c0132c',invStyle:'modern',invFooter:'',invShowRUC:true,invShowIVA:true,invShowVuelto:true,
+    tasaCambio:36.5,theme:'dark'
   }
 };
 let cart=[];
 let currentInvoice=null;
 let posCat='';
 let reportPeriod='today';
+let balancePeriod='day';
+let balanceSelectedDate=new Date();
 
 // ═══════════════════════ INIT ════════════════════════════════
 function init(){
@@ -1026,14 +1327,18 @@ function init(){
   if(!S.cfg.onboardingDone||!S.cfg.nombre) setTimeout(()=>openModal('onboardingModal'),400);
   updateCajaChip();
   updateCredBadge();
+  applyTheme();
+  initPWA();
+  setTimeout(checkStockAlerts, 2000);
+  initKeyboardShortcuts();
 }
 
 function renderAll(){
   renderPOS(); renderInventory(); buildCatFilter();
   renderKardex(); renderFacturas(); renderClientes();
-  renderCaja(); renderCreditos(); renderReportes();
+  renderCaja(); renderCreditos(); renderReportes(); renderBalance();
 }
-function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('es-NI')}
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('es')}
 
 // ═══════════════════════ SIDEBAR ═════════════════════════════
 function toggleSidebar(){
@@ -1054,6 +1359,7 @@ function switchView(id,el){
   if(el) el.classList.add('active');
   closeSidebar();
   if(id==='reportes') renderReportes();
+  if(id==='balance') renderBalance();
   if(id==='caja') renderCaja();
   if(id==='creditos') renderCreditos();
   if(id==='inventario'){renderInventory();buildCatFilter();}
@@ -1061,8 +1367,22 @@ function switchView(id,el){
 
 // ═══════════════════════ STORAGE ═════════════════════════════
 const KEY='cherry_pos_v3';
-function saveStorage(){localStorage.setItem(KEY,JSON.stringify(S))}
-function loadStorage(){try{const d=localStorage.getItem(KEY);if(d)S={...S,...JSON.parse(d)}}catch{}}
+function saveStorage(){
+  try{
+    const toSave={...S,cfg:{...S.cfg,logo:undefined}};
+    localStorage.setItem(KEY,JSON.stringify(toSave));
+    if(S.cfg.logo) localStorage.setItem(KEY+'_logo',S.cfg.logo);
+    else localStorage.removeItem(KEY+'_logo');
+  }catch(e){console.warn('saveStorage error:',e)}
+}
+function loadStorage(){
+  try{
+    const d=localStorage.getItem(KEY);
+    if(d){const parsed=JSON.parse(d);S={...S,...parsed};if(parsed.cfg)S.cfg={...S.cfg,...parsed.cfg}}
+    const logo=localStorage.getItem(KEY+'_logo');
+    if(logo)S.cfg.logo=logo;
+  }catch(e){console.warn('loadStorage error:',e)}
+}
 function exportAllData(){
   const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
   dl(URL.createObjectURL(b),`cherry_backup_${today()}.json`);
@@ -1109,6 +1429,16 @@ function loadCfgForm(){
   document.getElementById('cMoneda').value = c.moneda||'C$';
   document.getElementById('cStockMin').value=c.stockMin??5;
   document.getElementById('cFacNum').value = c.facNum??1;
+  updateLogoPreview();
+  // invoice custom
+  const ic=document.getElementById('invColor');if(ic)ic.value=S.cfg.invColor||'#c0132c';
+  const ich=document.getElementById('invColorHex');if(ich)ich.value=S.cfg.invColor||'#c0132c';
+  const is=document.getElementById('invStyle');if(is)is.value=S.cfg.invStyle||'modern';
+  const ifoot=document.getElementById('invFooter');if(ifoot)ifoot.value=S.cfg.invFooter||'';
+  const iruc=document.getElementById('invShowRUC');if(iruc)iruc.checked=S.cfg.invShowRUC!==false;
+  const iiva=document.getElementById('invShowIVA');if(iiva)iiva.checked=S.cfg.invShowIVA!==false;
+  const ivuelto=document.getElementById('invShowVuelto');if(ivuelto)ivuelto.checked=S.cfg.invShowVuelto!==false;
+  const tasa=document.getElementById('tasaCambio');if(tasa)tasa.value=S.cfg.tasaCambio||36.5;
   const tn=document.getElementById('topbarBiz');
   if(c.nombre){tn.textContent=c.nombre;tn.style.display='block'}else{tn.style.display='none'}
 }
@@ -1124,7 +1454,15 @@ function saveConfig(){
     moneda:document.getElementById('cMoneda').value,
     stockMin:parseInt(document.getElementById('cStockMin').value)||5,
     facNum:parseInt(document.getElementById('cFacNum').value)||1,
-    onboardingDone:true
+    onboardingDone:true,logo:S.cfg.logo,
+    invColor:document.getElementById('invColor')?.value||'#c0132c',
+    invStyle:document.getElementById('invStyle')?.value||'modern',
+    invFooter:document.getElementById('invFooter')?.value||'',
+    invShowRUC:document.getElementById('invShowRUC')?.checked!==false,
+    invShowIVA:document.getElementById('invShowIVA')?.checked!==false,
+    invShowVuelto:document.getElementById('invShowVuelto')?.checked!==false,
+    tasaCambio:parseFloat(document.getElementById('tasaCambio')?.value)||36.5,
+    theme:S.cfg.theme||'dark'
   };
   saveStorage();loadCfgForm();
   toast('Configuración guardada 🍒','success');
@@ -1237,7 +1575,7 @@ function renderCaja(){
   document.getElementById('cajaStatusBar').innerHTML=c.abierta?
     `<div class="caja-status-bar">
       <div class="caja-open-badge">🟢 Caja Abierta</div>
-      <div style="font-size:13px;color:var(--text2)">Cajero: <strong style="color:var(--text)">${c.cajero}</strong> · Apertura: <strong style="color:var(--text)">${new Date(c.apertura).toLocaleString('es-NI')}</strong></div>
+      <div style="font-size:13px;color:var(--text2)">Cajero: <strong style="color:var(--text)">${c.cajero}</strong> · Apertura: <strong style="color:var(--text)">${new Date(c.apertura).toLocaleString('es')}</strong></div>
       <div style="margin-left:auto;font-family:var(--mono);font-size:16px;font-weight:800;color:var(--green)">${mc}${fmt(calcEfectivoEnCaja())} <span style="font-size:12px;color:var(--text2)">en caja</span></div>
     </div>`:
     `<div class="caja-status-bar"><div class="caja-closed-badge">🔴 Caja Cerrada</div><div style="font-size:13px;color:var(--text2);margin-left:12px">Abre la caja para comenzar a vender</div></div>`;
@@ -1278,7 +1616,7 @@ function renderCaja(){
   document.getElementById('cajaHistorial').innerHTML=cierres.length?
     cierres.map(ci=>`
       <div class="cierre-hist-row">
-        <div><div style="font-weight:700;font-size:13px">${new Date(ci.fecha).toLocaleDateString('es-NI')}</div>
+        <div><div style="font-weight:700;font-size:13px">${new Date(ci.fecha).toLocaleDateString('es')}</div>
           <div style="color:var(--text2)">${ci.cajero} · ${ci.numFacturas} facturas</div>
           ${ci.diferencia!==0?`<div style="color:${ci.diferencia<0?'var(--danger)':'var(--green)'};font-size:11px">Diferencia: ${mc}${fmt(ci.diferencia)}</div>`:''}
         </div>
@@ -1365,7 +1703,7 @@ function renderCreditos(){
     const pct=Math.min(100,((c.abonado||0)/c.total*100));
     const statusClass=c.estado==='pagado'?'cred-status-paid':c.estado==='vencido'?'cred-status-overdue':'cred-status-pending';
     const badge=c.estado==='pagado'?'badge-green':c.estado==='vencido'?'badge-red':'badge-yellow';
-    const venc=c.vencimiento?new Date(c.vencimiento).toLocaleDateString('es-NI'):'—';
+    const venc=c.vencimiento?new Date(c.vencimiento).toLocaleDateString('es'):'—';
     return `<tr>
       <td style="font-family:var(--mono);color:var(--cherry-glow)">#${c.numFac}</td>
       <td><strong>${c.cliente}</strong></td>
@@ -1419,7 +1757,7 @@ function saveAbono(){
 function verAbonosCredito(id){
   const c=S.creditos.find(x=>x.id===id); if(!c) return;
   const mc=cur();
-  const abonos=(c.abonos||[]).map(a=>`<div class="metodo-row"><span>${new Date(a.fecha).toLocaleDateString('es-NI')} — ${a.metodo}${a.notas?' ('+a.notas+')':''}</span><span>${mc}${fmt(a.monto)}</span></div>`).join('');
+  const abonos=(c.abonos||[]).map(a=>`<div class="metodo-row"><span>${new Date(a.fecha).toLocaleDateString('es')} — ${a.metodo}${a.notas?' ('+a.notas+')':''}</span><span>${mc}${fmt(a.monto)}</span></div>`).join('');
   const html=`<div style="padding:16px"><h3 style="margin-bottom:12px">Crédito #${c.numFac} — ${c.cliente}</h3><div style="background:var(--surface2);border-radius:8px;padding:12px">${abonos||'<div style="color:var(--text3);text-align:center;padding:16px">Sin abonos</div>'}</div></div>`;
   document.getElementById('invPreviewWrap').innerHTML=html;
   openModal('invoiceModal');
@@ -1531,7 +1869,7 @@ function renderKardex(){
   tb.innerHTML=rows.map(k=>{
     const p=S.productos.find(x=>x.id===k.prodId);
     return `<tr class="${rc[k.tipo]||''}">
-      <td style="font-size:11.5px;color:var(--text2);white-space:nowrap">${new Date(k.fecha).toLocaleString('es-NI')}</td>
+      <td style="font-size:11.5px;color:var(--text2);white-space:nowrap">${new Date(k.fecha).toLocaleString('es')}</td>
       <td><span class="badge ${bc[k.tipo]||'badge-gray'}">${icons[k.tipo]||'•'} ${k.tipo}</span></td>
       <td><strong>${p?`${p.emoji||'📦'} ${p.nombre}`:'<span style="color:var(--text3)">Eliminado</span>'}</strong></td>
       <td style="font-family:var(--mono);font-weight:700;color:${k.cantidad>0?'var(--green)':'var(--danger)'};">${k.cantidad>0?'+':''}${k.cantidad}</td>
@@ -1766,7 +2104,7 @@ function renderFacturas(){
   if(!facs.length){tb.innerHTML=`<tr><td colspan="9" class="no-data"><div class="no-data-icon">🧾</div>Sin facturas</td></tr>`;return}
   tb.innerHTML=facs.map(f=>`<tr>
     <td><strong style="font-family:var(--mono);color:var(--cherry-glow)">#${f.num}</strong></td>
-    <td style="font-size:12px;white-space:nowrap">${new Date(f.fecha).toLocaleDateString('es-NI')}</td>
+    <td style="font-size:12px;white-space:nowrap">${new Date(f.fecha).toLocaleDateString('es')}</td>
     <td>${f.cliente||'—'}${f.nota?`<div style="font-size:10.5px;color:var(--text2)">📝 ${f.nota}</div>`:''}</td>
     <td><span class="badge badge-gray">${f.items.length}</span></td>
     <td style="font-family:var(--mono);font-size:12px">${mc}${fmt(f.sub)}</td>
@@ -1792,14 +2130,17 @@ function showInvoiceModal(f){
 function buildInvHTML(f){
   const c=S.cfg;const mc=c.moneda;
   const rows=f.items.map(i=>`<tr><td>${i.emoji||'📦'} ${i.nombre}</td><td style="text-align:center">${i.qty}</td><td style="text-align:right">${mc}${fmt(i.precio)}</td><td style="text-align:right">${mc}${fmt(i.subtotal)}</td></tr>`).join('');
+  const logoHtml=c.logo?`<img src="${c.logo}" style="max-width:90px;max-height:70px;object-fit:contain;border-radius:6px;margin-bottom:6px" alt="logo">`:'<span style="font-size:32px">🍒</span>';
   return `<div class="inv-preview" id="invPrint">
     <div class="inv-header">
-      <div><div style="font-size:20px;font-weight:900;color:#c0132c">🍒 ${c.nombre||'Cherry POS'}</div>
-        <div style="font-size:12px;color:#666;line-height:1.7;margin-top:4px">${c.rfc||''}<br>${c.dir||''}<br>${c.tel||''} · ${c.email||''}</div></div>
+      <div>
+        <div style="margin-bottom:6px">${logoHtml}</div>
+        <div style="font-size:20px;font-weight:900;color:#c0132c">${c.nombre||'Cherry POS'}</div>
+        <div style="font-size:12px;color:#666;line-height:1.7;margin-top:4px">${c.rfc?c.rfc+'<br>':''}${c.dir||''}<br>${c.tel||''} · ${c.email||''}</div></div>
       <div style="text-align:right">
         <div style="font-size:13px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:1px">Factura</div>
-        <div style="font-size:26px;font-weight:900;color:#c0132c">#${f.num}</div>
-        <div style="font-size:12px;color:#888">${new Date(f.fecha).toLocaleDateString('es-NI',{year:'numeric',month:'long',day:'numeric'})}</div>
+        <div style="font-size:26px;font-weight:900;color:${color}">#${f.num}</div>
+        <div style="font-size:12px;color:#888">${new Date(f.fecha).toLocaleDateString('es',{year:'numeric',month:'long',day:'numeric'})}</div>
       </div>
     </div>
     <div class="inv-meta">
@@ -1809,14 +2150,16 @@ function buildInvHTML(f){
       ${f.pago&&f.metodo!=='credito'?`<span><strong>Pagó:</strong> ${mc}${fmt(f.pago)}</span>`:''}
       ${f.vuelto!=null&&f.vuelto>=0?`<span><strong>Vuelto:</strong> ${mc}${fmt(f.vuelto)}</span>`:''}
     </div>
-    <table><thead><tr><th>Producto</th><th style="text-align:center">Cant.</th><th style="text-align:right">Precio</th><th style="text-align:right">Subtotal</th></tr></thead><tbody>${rows}</tbody></table>
+    <table style="--th-bg:${color}"><thead><tr><th style="background:${color}">Producto</th><th style="background:${color};text-align:center">Cant.</th><th style="background:${color};text-align:right">Precio</th><th style="background:${color};text-align:right">Subtotal</th></tr></thead><tbody>${rows}</tbody></table>
     <div class="inv-totals"><table>
       <tr><td>Subtotal:</td><td style="text-align:right">${mc}${fmt(f.sub)}</td></tr>
       ${f.disc>0?`<tr><td style="color:#e44">Descuento ${f.disc}%:</td><td style="text-align:right;color:#e44">−${mc}${fmt(f.da)}</td></tr>`:''}
       <tr><td>IVA ${c.iva}%:</td><td style="text-align:right">${mc}${fmt(f.iva)}</td></tr>
-      <tr class="inv-grand"><td>TOTAL:</td><td style="text-align:right;color:#c0132c">${mc}${fmt(f.tot)}</td></tr>
+      <tr class="inv-grand"><td>TOTAL:</td><td style="text-align:right;color:${color}">${mc}${fmt(f.tot)}</td></tr>
     </table></div>
-    <div class="inv-footer">${c.msg||'Gracias por su compra'}</div>
+    ${c.invShowIVA!==false?`<div style="font-size:11px;color:#999;text-align:right;margin-top:4px">Base imponible: ${mc}${fmt(f.sub)} + IVA ${c.iva}%: ${mc}${fmt(f.iva)}</div>`:''}
+    ${f.pago&&f.metodo!=='credito'&&c.invShowVuelto!==false?`<div style="font-size:11px;color:#999;text-align:right">Recibido: ${mc}${fmt(f.pago)} · Vuelto: ${mc}${fmt(f.vuelto||0)}</div>`:''}
+    <div class="inv-footer">${c.msg||'Gracias por su compra'}${c.invFooter?'<br>'+c.invFooter:''}</div>
     <div class="inv-brand">🍒 Cherry v3.0 by berry</div>
   </div>`;
 }
@@ -1835,7 +2178,7 @@ function openEmailForFac(f){
   document.getElementById('eTo').value=cli?.email||'';
   document.getElementById('eCC').value=c.email||'';
   document.getElementById('eSubject').value=`Factura #${f.num} — ${c.nombre||'Cherry POS'}`;
-  document.getElementById('eBody').value=`Estimado/a ${f.cliente||'cliente'},\n\nAdjunto su factura #${f.num} por un total de ${c.moneda}${fmt(f.tot)}.\n\nFecha: ${new Date(f.fecha).toLocaleDateString('es-NI')}\nMétodo: ${f.metodo}\n\n${c.msg||'Gracias por su compra.'}\n\n${c.nombre||''}\n${c.tel||''} · ${c.email||''}`;
+  document.getElementById('eBody').value=`Estimado/a ${f.cliente||'cliente'},\n\nAdjunto su factura #${f.num} por un total de ${c.moneda}${fmt(f.tot)}.\n\nFecha: ${new Date(f.fecha).toLocaleDateString('es')}\nMétodo: ${f.metodo}\n\n${c.msg||'Gracias por su compra.'}\n\n${c.nombre||''}\n${c.tel||''} · ${c.email||''}`;
   openModal('emailModal');
 }
 function doSendEmail(){
@@ -1919,11 +2262,15 @@ function renderReportes(){
   document.getElementById('reportRecent').innerHTML=facs.slice(-7).reverse().map(f=>
     `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
       <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.cliente||'Consumidor Final'}</div>
-        <div style="font-size:11px;color:var(--text2)">#${f.num} · ${f.metodo==='credito'?'🔴 Crédito':f.metodo} · ${new Date(f.fecha).toLocaleDateString('es-NI')}</div>
+        <div style="font-size:11px;color:var(--text2)">#${f.num} · ${f.metodo==='credito'?'🔴 Crédito':f.metodo} · ${new Date(f.fecha).toLocaleDateString('es')}</div>
       </div>
       <span style="font-family:var(--mono);font-weight:800;color:var(--cherry-glow);white-space:nowrap">${mc}${fmt(f.tot)}</span>
     </div>`
   ).join('')||'<div class="no-data">Sin ventas</div>';
+
+  // Ventas por hora
+  const horaEl=document.getElementById('reportHoras');
+  if(horaEl) horaEl.innerHTML=renderVentasPorHora(facs);
 }
 
 // ═══════════════════════ CLIENTES ════════════════════════════
@@ -1991,7 +2338,7 @@ function exportOneInvoiceXLSX(f){
   const c=S.cfg;const mc=c.moneda;
   const data=[
     [`FACTURA #${f.num} — ${c.nombre||'Cherry POS'}`,'','',''],
-    ['RUC:',c.rfc||'','Fecha:',new Date(f.fecha).toLocaleDateString('es-NI')],
+    ['RUC:',c.rfc||'','Fecha:',new Date(f.fecha).toLocaleDateString('es')],
     ['Dirección:',c.dir||'','Cliente:',f.cliente],
     ['Teléfono:',c.tel||'','Método:',f.metodo],
     [],['Producto','Cantidad','Precio Unitario','Subtotal'],
@@ -2010,7 +2357,7 @@ function exportInventoryXLSX(){
   const c=S.cfg;const mc=c.moneda;
   const hdr=['Código','Nombre','Categoría','Proveedor','Costo','Venta','Margen %','Stock','Unidad','Stock Mín','Valor Total','Estado'];
   const rows=S.productos.map(p=>[p.codigo||'',p.nombre,p.categoria||'',p.proveedor||'',p.costo||0,p.precio,p.costo>0?+((p.precio-p.costo)/p.precio*100).toFixed(1):0,p.stock,p.unidad||'',p.stockMin,p.stock*p.precio,p.stock<=0?'Sin stock':p.stock<=(p.stockMin||S.cfg.stockMin)?'Bajo':'OK']);
-  const ws=XLSX.utils.aoa_to_sheet([[`INVENTARIO — ${c.nombre||'Cherry POS'}`],[`Generado: ${new Date().toLocaleString('es-NI')}`],[],hdr,...rows,[],['Total prods:',S.productos.length,'','','','','','','','Valor total:',S.productos.reduce((s,p)=>s+p.stock*p.precio,0),'']]);
+  const ws=XLSX.utils.aoa_to_sheet([[`INVENTARIO — ${c.nombre||'Cherry POS'}`],[`Generado: ${new Date().toLocaleString('es')}`],[],hdr,...rows,[],['Total prods:',S.productos.length,'','','','','','','','Valor total:',S.productos.reduce((s,p)=>s+p.stock*p.precio,0),'']]);
   ws['!cols']=hdr.map(()=>({wch:16}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Inventario');
   XLSX.writeFile(wb,`Cherry_Inventario_${today()}.xlsx`);toast('Excel inventario 📦','success');
 }
@@ -2018,8 +2365,8 @@ function exportInventoryXLSX(){
 function exportKardexXLSX(){
   const c=S.cfg;
   const hdr=['Fecha','Tipo','Producto','Cantidad','Costo Unit.','Total','Referencia','Notas'];
-  const rows=[...S.kardex].reverse().map(k=>{const p=S.productos.find(x=>x.id===k.prodId);return[new Date(k.fecha).toLocaleString('es-NI'),k.tipo,p?p.nombre:'Eliminado',k.cantidad,k.costo,k.total,k.ref||'',k.notas||'']});
-  const ws=XLSX.utils.aoa_to_sheet([[`KÁRDEX — ${c.nombre||''}`],[`Generado: ${new Date().toLocaleString('es-NI')}`],[],hdr,...rows]);
+  const rows=[...S.kardex].reverse().map(k=>{const p=S.productos.find(x=>x.id===k.prodId);return[new Date(k.fecha).toLocaleString('es'),k.tipo,p?p.nombre:'Eliminado',k.cantidad,k.costo,k.total,k.ref||'',k.notas||'']});
+  const ws=XLSX.utils.aoa_to_sheet([[`KÁRDEX — ${c.nombre||''}`],[`Generado: ${new Date().toLocaleString('es')}`],[],hdr,...rows]);
   ws['!cols']=[{wch:22},{wch:13},{wch:26},{wch:10},{wch:14},{wch:14},{wch:16},{wch:26}];
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Kardex');
   XLSX.writeFile(wb,`Cherry_Kardex_${today()}.xlsx`);toast('Excel kárdex 📋','success');
@@ -2028,8 +2375,8 @@ function exportKardexXLSX(){
 function exportFacturasXLSX(){
   const c=S.cfg;
   const hdr=['# Factura','Fecha','Cliente','Items','Subtotal','IVA','Total','Método','Nota','Detalle'];
-  const rows=S.facturas.map(f=>[f.num,new Date(f.fecha).toLocaleString('es-NI'),f.cliente||'',f.items.length,f.sub,f.iva,f.tot,f.metodo,f.nota||'',f.items.map(i=>`${i.nombre}×${i.qty}`).join(' | ')]);
-  const ws=XLSX.utils.aoa_to_sheet([[`FACTURAS — ${c.nombre||''}`],[`Generado: ${new Date().toLocaleString('es-NI')}`],[],hdr,...rows,[],['Total:',S.facturas.length,'','',S.facturas.reduce((s,f)=>s+f.sub,0),S.facturas.reduce((s,f)=>s+f.iva,0),S.facturas.reduce((s,f)=>s+f.tot,0),'','','']]);
+  const rows=S.facturas.map(f=>[f.num,new Date(f.fecha).toLocaleString('es'),f.cliente||'',f.items.length,f.sub,f.iva,f.tot,f.metodo,f.nota||'',f.items.map(i=>`${i.nombre}×${i.qty}`).join(' | ')]);
+  const ws=XLSX.utils.aoa_to_sheet([[`FACTURAS — ${c.nombre||''}`],[`Generado: ${new Date().toLocaleString('es')}`],[],hdr,...rows,[],['Total:',S.facturas.length,'','',S.facturas.reduce((s,f)=>s+f.sub,0),S.facturas.reduce((s,f)=>s+f.iva,0),S.facturas.reduce((s,f)=>s+f.tot,0),'','','']]);
   ws['!cols']=[{wch:10},{wch:20},{wch:22},{wch:8},{wch:13},{wch:13},{wch:13},{wch:14},{wch:20},{wch:50}];
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Facturas');
   XLSX.writeFile(wb,`Cherry_Facturas_${today()}.xlsx`);toast('Excel facturas 🧾','success');
@@ -2038,8 +2385,8 @@ function exportFacturasXLSX(){
 function exportCreditosXLSX(){
   const c=S.cfg;const mc=c.moneda;
   const hdr=['# Factura','Cliente','Total','Abonado','Saldo','Vencimiento','Estado','Historial Abonos'];
-  const rows=S.creditos.map(cr=>[cr.numFac,cr.cliente,cr.total,cr.abonado||0,cr.total-(cr.abonado||0),cr.vencimiento||'—',cr.estado,(cr.abonos||[]).map(a=>`${new Date(a.fecha).toLocaleDateString('es-NI')} ${a.metodo} ${mc}${fmt(a.monto)}`).join(' | ')]);
-  const ws=XLSX.utils.aoa_to_sheet([[`CRÉDITOS — ${c.nombre||''}`],[`Generado: ${new Date().toLocaleString('es-NI')}`],[],hdr,...rows]);
+  const rows=S.creditos.map(cr=>[cr.numFac,cr.cliente,cr.total,cr.abonado||0,cr.total-(cr.abonado||0),cr.vencimiento||'—',cr.estado,(cr.abonos||[]).map(a=>`${new Date(a.fecha).toLocaleDateString('es')} ${a.metodo} ${mc}${fmt(a.monto)}`).join(' | ')]);
+  const ws=XLSX.utils.aoa_to_sheet([[`CRÉDITOS — ${c.nombre||''}`],[`Generado: ${new Date().toLocaleString('es')}`],[],hdr,...rows]);
   ws['!cols']=[{wch:10},{wch:22},{wch:13},{wch:13},{wch:13},{wch:14},{wch:12},{wch:50}];
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Créditos');
   XLSX.writeFile(wb,`Cherry_Creditos_${today()}.xlsx`);toast('Excel créditos 💳','success');
@@ -2051,7 +2398,7 @@ function exportCierreXLSX(){
   const sub=turno.reduce((s,f)=>s+f.sub,0);
   const ivaT=turno.reduce((s,f)=>s+f.iva,0);
   const metodos=['Efectivo','Tarjeta','Transferencia','credito'];
-  const data=[[`RESUMEN TURNO — ${c.nombre||''}`],[`Cajero: ${S.caja.cajero}`],[`Apertura: ${new Date(S.caja.apertura).toLocaleString('es-NI')}`],[`Generado: ${new Date().toLocaleString('es-NI')}`],[],
+  const data=[[`RESUMEN TURNO — ${c.nombre||''}`],[`Cajero: ${S.caja.cajero}`],[`Apertura: ${new Date(S.caja.apertura).toLocaleString('es')}`],[`Generado: ${new Date().toLocaleString('es')}`],[],
     ['RESUMEN',''],['Total Ventas:',tot],['Facturas:',turno.length],['Base Imponible:',sub],[`IVA ${c.iva}%:`,ivaT],['Efectivo en caja:',calcEfectivoEnCaja()],[],
     ['POR MÉTODO',''],
     ...metodos.map(mt=>[mt==='credito'?'Crédito':mt,turno.filter(f=>f.metodo===mt).reduce((s,f)=>s+f.tot,0)]),
@@ -2072,14 +2419,14 @@ function exportReporteXLSX(){
   const periodos={today:'Hoy',week:'Esta semana',month:'Este mes',year:'Este año',all:'Todo'};
   const wb=XLSX.utils.book_new();
   const wsR=XLSX.utils.aoa_to_sheet([
-    [`REPORTE — ${c.nombre||''} — Período: ${periodos[reportPeriod]||''}`],[`Generado: ${new Date().toLocaleString('es-NI')}`],[],
+    [`REPORTE — ${c.nombre||''} — Período: ${periodos[reportPeriod]||''}`],[`Generado: ${new Date().toLocaleString('es')}`],[],
     ['VENTAS',''],['Total ingresos:',tot],['Facturas:',facs.length],['Base imponible:',sub],[`IVA ${c.iva}%:`,ivaT],['Costo total:',costo],['Utilidad:',tot-costo-ivaT],[],
     ['IVA DESGLOSADO',''],['Ventas totales (con IVA):',tot],['Base imponible:',sub],[`IVA a declarar (${c.iva}%):`,ivaT],[],
     ['POR MÉTODO',''],
     ...['Efectivo','Tarjeta','Transferencia','credito'].map(mt=>[mt==='credito'?'Crédito':mt,facs.filter(f=>f.metodo===mt).reduce((s,f)=>s+f.tot,0)])
   ]);
   XLSX.utils.book_append_sheet(wb,wsR,'Resumen');
-  const wsF=XLSX.utils.aoa_to_sheet([['#','Fecha','Cliente','Subtotal','IVA','Total','Método'],...facs.map(f=>[f.num,new Date(f.fecha).toLocaleDateString('es-NI'),f.cliente||'',f.sub,f.iva,f.tot,f.metodo])]);
+  const wsF=XLSX.utils.aoa_to_sheet([['#','Fecha','Cliente','Subtotal','IVA','Total','Método'],...facs.map(f=>[f.num,new Date(f.fecha).toLocaleDateString('es'),f.cliente||'',f.sub,f.iva,f.tot,f.metodo])]);
   XLSX.utils.book_append_sheet(wb,wsF,'Detalle Facturas');
   XLSX.writeFile(wb,`Cherry_Reporte_${today()}.xlsx`);toast('Reporte Excel completo 📊','success');
 }
@@ -2120,23 +2467,495 @@ function loadSampleData(){
     S.productos.push(prod);addKardex(prod.id,'entrada',prod.stock,prod.costo,'INI-001','Carga inicial');
   });
   const clientes=[
-    {nombre:'María González',rfc:'J001-123456-0001A',email:'maria@email.com',tel:'+505 8888-0001',dir:'Bo. El Carmen, Managua'},
+    {nombre:'María González',rfc:'J001-123456-0001A',email:'maria@email.com',tel:'+505 8888-0001',dir:'Tu dirección aquí'},
     {nombre:'Carlos Pérez',rfc:'J001-234567-0002B',email:'carlos@email.com',tel:'+505 8888-0002',dir:'Reparto Schick, Managua'},
     {nombre:'Tech Solutions SA',rfc:'J310-000012-0003C',email:'compras@tech.com',tel:'+505 2222-0003',dir:'KM 8 Carretera Sur'},
   ];
   clientes.forEach(c=>S.clientes.push({...c,id:uid(),compras:0,totalGastado:0,createdAt:new Date().toISOString()}));
+  // sample gastos
+  const sGastos=[
+    {desc:'Compra de inventario inicial',monto:3500,categoria:'Inventario / Compras',fecha:today()},
+    {desc:'Alquiler del local',monto:2000,categoria:'Alquiler / Local',fecha:today()},
+    {desc:'Servicios básicos',monto:450,categoria:'Servicios (agua, luz)',fecha:today()},
+    {desc:'Transporte de mercadería',monto:300,categoria:'Transporte',fecha:today()},
+  ];
+  sGastos.forEach(g=>S.gastos.push({...g,id:uid(),notas:'',createdAt:new Date().toISOString()}));
   saveStorage();renderAll();buildCatPills();buildCatFilter();
   toast('Datos de ejemplo cargados 🍒','success');
 }
 function clearAllData(){
   if(!confirm('⚠️ ¿Borrar TODO? No se puede deshacer.')) return;
-  S.productos=[];S.kardex=[];S.facturas=[];S.clientes=[];S.creditos=[];
+  S.productos=[];S.kardex=[];S.facturas=[];S.clientes=[];S.creditos=[];S.gastos=[];
   S.caja={abierta:false,cajero:'',fondoInicial:0,apertura:null,cierres:[]};
   S.cfg.onboardingDone=false;S.cfg.facNum=1;
   saveStorage();renderAll();buildCatPills();buildCatFilter();updateCajaChip();
   toast('Todos los datos eliminados','info');
 }
-function skipOnboarding(){S.cfg.onboardingDone=true;saveStorage();closeModal('onboardingModal');toast('Configura en ⚙️','info')}
+
+
+// ═══════════════════════ LOGO ════════════════════════════════
+function handleLogoUpload(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{S.cfg.logo=e.target.result;saveStorage();updateLogoPreview();toast('Logo cargado ✅','success')};
+  reader.readAsDataURL(file);
+}
+function updateLogoPreview(){
+  const img=document.getElementById('logoImg');const ph=document.getElementById('logoPlaceholder');const btn=document.getElementById('logoRemoveBtn');
+  if(S.cfg.logo){img.src=S.cfg.logo;img.style.display='block';ph.style.display='none';if(btn)btn.style.display='inline-flex';}
+  else{img.style.display='none';ph.style.display='block';if(btn)btn.style.display='none';}
+}
+function removeLogo(){S.cfg.logo=null;saveStorage();updateLogoPreview();toast('Logo eliminado','info')}
+
+// ═══════════════════════ GASTOS ══════════════════════════════
+function saveGasto(){
+  const desc=document.getElementById('gastoDesc').value.trim();
+  const monto=parseFloat(document.getElementById('gastoMonto').value)||0;
+  if(!desc||monto<=0){toast('Descripción y monto requeridos','error');return}
+  const id=document.getElementById('gastoId').value||uid();
+  const ex=S.gastos.find(g=>g.id===id);
+  const gasto={id,desc,monto,
+    categoria:document.getElementById('gastoCat').value,
+    fecha:document.getElementById('gastoFecha').value||today(),
+    notas:document.getElementById('gastoNotas').value,
+    createdAt:ex?ex.createdAt:new Date().toISOString()};
+  if(!ex)S.gastos.push(gasto);else Object.assign(ex,gasto);
+  saveStorage();renderBalance();closeModal('gastoModal');
+  toast(`Gasto ${ex?'actualizado':'registrado'}: ${cur()}${fmt(monto)} ✅`,'success');
+}
+function editGasto(id){
+  const g=S.gastos.find(x=>x.id===id);if(!g)return;
+  document.getElementById('gastoId').value=g.id;
+  document.getElementById('gastoDesc').value=g.desc;
+  document.getElementById('gastoMonto').value=g.monto;
+  document.getElementById('gastoCat').value=g.categoria;
+  document.getElementById('gastoFecha').value=g.fecha;
+  document.getElementById('gastoNotas').value=g.notas||'';
+  openModal('gastoModal');
+}
+function deleteGasto(id){
+  if(!confirm('¿Eliminar este gasto?'))return;
+  S.gastos=S.gastos.filter(g=>g.id!==id);
+  saveStorage();renderBalance();toast('Gasto eliminado','info');
+}
+function openNuevoGasto(){
+  document.getElementById('gastoId').value='';
+  document.getElementById('gastoDesc').value='';
+  document.getElementById('gastoMonto').value='';
+  document.getElementById('gastoFecha').value=today();
+  document.getElementById('gastoNotas').value='';
+  openModal('gastoModal');
+}
+
+// ═══════════════════════ BALANCE ═════════════════════════════
+
+function setBalancePeriod(p,el){
+  balancePeriod=p;
+  document.querySelectorAll('#view-balance .rp-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderBalance();
+}
+function getBalanceRange(){
+  const d=balanceSelectedDate;
+  if(balancePeriod==='day'){
+    const s=new Date(d);s.setHours(0,0,0,0);const e=new Date(d);e.setHours(23,59,59,999);
+    return{start:s,end:e,label:s.toLocaleDateString('es',{weekday:'short',day:'numeric',month:'short'})};
+  }
+  if(balancePeriod==='week'){
+    const day=d.getDay();const diff=d.getDate()-day+(day===0?-6:1);
+    const s=new Date(d);s.setDate(diff);s.setHours(0,0,0,0);
+    const e=new Date(s);e.setDate(s.getDate()+6);e.setHours(23,59,59,999);
+    return{start:s,end:e,label:`Sem. ${s.toLocaleDateString('es',{day:'numeric',month:'short'})}`};
+  }
+  if(balancePeriod==='month'){
+    const s=new Date(d.getFullYear(),d.getMonth(),1);
+    const e=new Date(d.getFullYear(),d.getMonth()+1,0,23,59,59,999);
+    return{start:s,end:e,label:s.toLocaleDateString('es',{month:'long',year:'numeric'})};
+  }
+  if(balancePeriod==='year'){
+    const s=new Date(d.getFullYear(),0,1);const e=new Date(d.getFullYear(),11,31,23,59,59,999);
+    return{start:s,end:e,label:String(d.getFullYear())};
+  }
+  return{start:new Date(0),end:new Date(9999,0),label:'Todo'};
+}
+function renderBalance(){
+  const mc=cur();
+  const{start,end,label}=getBalanceRange();
+  document.getElementById('balancePeriodLabel').textContent=label;
+  const facs=S.facturas.filter(f=>{const d=new Date(f.fecha);return d>=start&&d<=end});
+  const gastosFil=S.gastos.filter(g=>{const d=new Date(g.fecha+'T00:00:00');return d>=start&&d<=end});
+  const totalIng=facs.reduce((s,f)=>s+f.tot,0);
+  const totalEg=gastosFil.reduce((s,g)=>s+g.monto,0);
+  const balance=totalIng-totalEg;
+  const ivaT=facs.reduce((s,f)=>s+f.iva,0);
+
+  document.getElementById('balanceTotal').innerHTML=`<span style="color:${balance>=0?'var(--green)':'var(--danger)'}">${mc}${fmt(balance)}</span>`;
+  document.getElementById('balanceIngresos').textContent=mc+fmt(totalIng);
+  document.getElementById('balanceEgresos').textContent=mc+fmt(totalEg);
+
+  document.getElementById('balanceStats').innerHTML=`
+    <div class="stat-card green"><div class="stat-glow"></div><div class="stat-label">Ingresos</div><div class="stat-value">${mc}${totalIng>=1000?(totalIng/1000).toFixed(1)+'K':fmt(totalIng)}</div><div class="stat-sub">${facs.length} ventas</div></div>
+    <div class="stat-card cherry"><div class="stat-glow"></div><div class="stat-label">Egresos</div><div class="stat-value">${mc}${totalEg>=1000?(totalEg/1000).toFixed(1)+'K':fmt(totalEg)}</div><div class="stat-sub">${gastosFil.length} gastos</div></div>
+    <div class="stat-card ${balance>=0?'blue':'cherry'}"><div class="stat-glow"></div><div class="stat-label">Balance Neto</div><div class="stat-value ${balance>=0?'profit-pos':'profit-neg'}">${mc}${Math.abs(balance)>=1000?(Math.abs(balance)/1000).toFixed(1)+'K':fmt(Math.abs(balance))}</div><div class="stat-sub">${balance>=0?'✅ Positivo':'⚠️ Negativo'}</div></div>
+    <div class="stat-card warn"><div class="stat-glow"></div><div class="stat-label">IVA del período</div><div class="stat-value">${mc}${ivaT>=1000?(ivaT/1000).toFixed(1)+'K':fmt(ivaT)}</div><div class="stat-sub">a declarar</div></div>`;
+
+  // date nav
+  const nav=document.getElementById('balanceDateNav');
+  const dates=[];
+  for(let i=4;i>=0;i--){
+    const d=new Date();
+    if(balancePeriod==='day')d.setDate(d.getDate()-i);
+    else if(balancePeriod==='week')d.setDate(d.getDate()-i*7);
+    else if(balancePeriod==='month')d.setMonth(d.getMonth()-i);
+    else if(balancePeriod==='year')d.setFullYear(d.getFullYear()-i);
+    dates.push(new Date(d));
+  }
+  nav.innerHTML=dates.map((d,idx)=>{
+    let lbl='';
+    if(balancePeriod==='day')lbl=d.toLocaleDateString('es',{day:'numeric',month:'short'});
+    else if(balancePeriod==='week')lbl='Sem '+d.toLocaleDateString('es',{day:'2-digit',month:'2-digit'});
+    else if(balancePeriod==='month')lbl=d.toLocaleDateString('es',{month:'short',year:'2-digit'});
+    else lbl=d.getFullYear();
+    const isActive=idx===4;
+    return `<button class="date-btn ${isActive?'active':''}" onclick="balanceSelectedDate=new Date('${d.toISOString()}');renderBalance()">${lbl}</button>`;
+  }).join('');
+
+  // ingreso list
+  const ingRows=facs.slice().reverse().slice(0,20).map(f=>`
+    <div class="hist-row">
+      <div class="hist-dot" style="background:var(--green)"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.cliente||'Consumidor Final'}</div>
+        <div style="font-size:11px;color:var(--text2)">#${f.num} · ${f.metodo} · ${new Date(f.fecha).toLocaleDateString('es')}</div>
+      </div>
+      <span style="font-family:var(--mono);font-weight:800;color:var(--green);white-space:nowrap">${mc}${fmt(f.tot)}</span>
+    </div>`).join('');
+  document.getElementById('balanceIngList').innerHTML=ingRows||'<div class="no-data"><div class="no-data-icon">↗️</div>Sin ingresos en este período</div>';
+
+  // egreso list
+  const egRows=gastosFil.slice().reverse().map(g=>`
+    <div class="hist-row">
+      <div class="hist-dot" style="background:var(--danger)"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${g.desc}</div>
+        <div style="font-size:11px;color:var(--text2)">${g.categoria} · ${g.fecha}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span style="font-family:var(--mono);font-weight:800;color:var(--danger);white-space:nowrap">−${mc}${fmt(g.monto)}</span>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-ghost btn-xs" onclick="editGasto('${g.id}')">✏️</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteGasto('${g.id}')">🗑</button>
+        </div>
+      </div>
+    </div>`).join('');
+  document.getElementById('balanceEgList').innerHTML=egRows||'<div class="no-data"><div class="no-data-icon">↘️</div>Sin gastos en este período. <button class="btn btn-cherry btn-sm" onclick="openNuevoGasto()" style="margin-top:10px">+ Agregar gasto</button></div>';
+
+  renderBalanceChart();
+  renderGastosChart(gastosFil);
+}
+function renderBalanceChart(){
+  const mc=cur();
+  const days=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+    const dEnd=new Date(d);dEnd.setHours(23,59,59,999);
+    const ing=S.facturas.filter(f=>{const fd=new Date(f.fecha);return fd>=d&&fd<=dEnd}).reduce((s,f)=>s+f.tot,0);
+    const eg=(S.gastos||[]).filter(g=>{const gd=new Date(g.fecha+'T00:00:00');return gd>=d&&gd<=dEnd}).reduce((s,g)=>s+g.monto,0);
+    days.push({label:d.toLocaleDateString('es',{weekday:'short',day:'numeric'}),ing,eg});
+  }
+  const maxVal=Math.max(...days.map(d=>Math.max(d.ing,d.eg)),1);
+  const bars=days.map(d=>{
+    const ingH=Math.max(3,Math.round(d.ing/maxVal*80));
+    const egH=Math.max(3,Math.round(d.eg/maxVal*80));
+    return `<div class="bal-bar-col">
+      <div class="bal-bar-bars">
+        <div class="bal-bar-ing" style="height:${ingH}px" title="${mc}${fmt(d.ing)}"></div>
+        <div class="bal-bar-eg"  style="height:${egH}px"  title="${mc}${fmt(d.eg)}"></div>
+      </div>
+      <div class="bal-bar-label">${d.label}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('balanceChart').innerHTML=`
+    <div class="bal-bar-wrap">${bars}</div>
+    <div class="bal-legend">
+      <span><div class="dot" style="background:var(--green);width:10px;height:10px;border-radius:3px"></div>Ingresos</span>
+      <span><div class="dot" style="background:var(--danger);width:10px;height:10px;border-radius:3px"></div>Gastos</span>
+    </div>`;
+}
+function renderGastosChart(gastosFil){
+  const mc=cur();
+  const catMap={};
+  gastosFil.forEach(g=>{catMap[g.categoria]=(catMap[g.categoria]||0)+g.monto});
+  const cats=Object.entries(catMap).sort((a,b)=>b[1]-a[1]);
+  const maxCat=cats[0]?.[1]||1;
+  document.getElementById('gastosChart').innerHTML=cats.length?cats.map(([cat,total])=>`
+    <div class="bar-chart-item">
+      <span style="font-size:14px;width:20px">🏷️</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12.5px;font-weight:700;margin-bottom:4px">${cat}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${(total/maxCat*100).toFixed(0)}%;background:linear-gradient(90deg,var(--danger),rgba(255,68,102,.4))"></div></div>
+      </div>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--danger);min-width:70px;text-align:right">${mc}${fmt(total)}</span>
+    </div>`).join(''):'<div class="no-data">Sin gastos en este período</div>';
+}
+function exportBalanceXLSX(){
+  const{start,end,label}=getBalanceRange();const mc=cur();
+  const facs=S.facturas.filter(f=>{const d=new Date(f.fecha);return d>=start&&d<=end});
+  const gastosFil=S.gastos.filter(g=>{const d=new Date(g.fecha+'T00:00:00');return d>=start&&d<=end});
+  const totalIng=facs.reduce((s,f)=>s+f.tot,0);
+  const totalEg=gastosFil.reduce((s,g)=>s+g.monto,0);
+  const wb=XLSX.utils.book_new();
+  const wsR=XLSX.utils.aoa_to_sheet([
+    [`BALANCE — ${S.cfg.nombre||'Cherry POS'} — ${label}`],[`Generado: ${new Date().toLocaleString('es')}`],[],
+    ['RESUMEN',''],['Total Ingresos:',totalIng],['Total Egresos:',totalEg],['Balance Neto:',totalIng-totalEg],[],
+    ['INGRESOS'],['Fecha','Cliente','#Factura','Método','Total'],
+    ...facs.map(f=>[new Date(f.fecha).toLocaleDateString('es'),f.cliente||'',f.num,f.metodo,f.tot]),
+    [],[`Total ingresos:`,totalIng],[],
+    ['EGRESOS'],['Fecha','Descripción','Categoría','Monto'],
+    ...gastosFil.map(g=>[g.fecha,g.desc,g.categoria,g.monto]),
+    [],[`Total egresos:`,totalEg]
+  ]);
+  wsR['!cols']=[{wch:20},{wch:24},{wch:14},{wch:16},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,wsR,'Balance');
+  XLSX.writeFile(wb,`Cherry_Balance_${today()}.xlsx`);
+  toast('Excel de balance listo 📈','success');
+}
+
+
+// ═══════════════════════ THEME ═══════════════════════════════
+function applyTheme(){
+  const t=S.cfg.theme||'dark';
+  document.documentElement.setAttribute('data-theme',t==='light'?'light':'');
+  const btn=document.getElementById('themeBtn');
+  if(btn)btn.textContent=t==='light'?'🌙':'☀️';
+}
+function toggleTheme(){
+  S.cfg.theme=S.cfg.theme==='light'?'dark':'light';
+  applyTheme();saveStorage();
+  toast(S.cfg.theme==='light'?'Modo claro activado ☀️':'Modo oscuro activado 🌙','info');
+}
+
+// ═══════════════════════ PWA ══════════════════════════════════
+function initPWA(){
+  // Inline manifest as data URI
+  const manifest={
+    name:'Cherry POS v3.0',short_name:'Cherry POS',
+    description:'Sistema POS by berry',
+    start_url:'.',display:'standalone',
+    background_color:'#0d0608',theme_color:'#c0132c',
+    icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23c0132c'/><text y='.9em' font-size='75' x='10'>🍒</text></svg>",sizes:'192x192',type:'image/svg+xml'},{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23c0132c'/><text y='.9em' font-size='75' x='10'>🍒</text></svg>",sizes:'512x512',type:'image/svg+xml'}]
+  };
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  const link=document.getElementById('pwaManifest');
+  if(link)link.href=URL.createObjectURL(blob);
+
+  // Service Worker para offline
+  if('serviceWorker' in navigator){
+    const swCode=`
+const CACHE='cherry-v3-cache';
+const ASSETS=['/'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
+self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).catch(()=>caches.match('/'))))); `;
+    const swBlob=new Blob([swCode],{type:'application/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(()=>{});
+  }
+
+  // Install prompt
+  let deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault();deferredPrompt=e;
+    showInstallBanner();
+  });
+}
+function showInstallBanner(){
+  const existing=document.getElementById('installBanner');
+  if(existing)return;
+  const banner=document.createElement('div');
+  banner.id='installBanner';
+  banner.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--cherry);color:white;padding:12px 20px;border-radius:99px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:10px;z-index:2000;box-shadow:0 4px 20px rgba(192,19,44,.4);cursor:pointer;animation:toastIn .4s ease';
+  banner.innerHTML='📱 Instalar Cherry POS como app <button onclick="installPWA()" style="background:white;color:var(--cherry);border:none;padding:4px 12px;border-radius:99px;font-weight:700;cursor:pointer;font-size:12px">Instalar</button><button onclick="this.parentElement.remove()" style="background:none;border:none;color:white;cursor:pointer;font-size:16px;padding:0 4px">✕</button>';
+  document.body.appendChild(banner);
+  setTimeout(()=>banner.remove(),8000);
+}
+async function installPWA(){
+  const prompt=window._deferredInstallPrompt;
+  if(prompt){await prompt.prompt();prompt.userChoice.then(()=>{window._deferredInstallPrompt=null});const b=document.getElementById('installBanner');if(b)b.remove();}
+}
+
+// ═══════════════════════ KEYBOARD SHORTCUTS ══════════════════
+function initKeyboardShortcuts(){
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT') return;
+    if(e.key==='F1'){e.preventDefault();switchView('pos',document.querySelector('[data-view=pos]'))}
+    if(e.key==='F2'){e.preventDefault();switchView('inventario',document.querySelector('[data-view=inventario]'))}
+    if(e.key==='F3'){e.preventDefault();switchView('caja',document.querySelector('[data-view=caja]'))}
+    if(e.key==='F4'){e.preventDefault();switchView('reportes',document.querySelector('[data-view=reportes]'))}
+    if(e.key==='F5'){e.preventDefault();switchView('balance',document.querySelector('[data-view=balance]'))}
+    if(e.key==='Escape'){document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'))}
+    if(e.key==='+'&&e.ctrlKey){e.preventDefault();showProductModal()}
+    if(e.key==='d'&&e.ctrlKey){e.preventDefault();toggleTheme()}
+  });
+}
+
+// ═══════════════════════ STOCK ALERTS ════════════════════════
+function checkStockAlerts(){
+  const lowProds=S.productos.filter(p=>p.stock<=(p.stockMin||S.cfg.stockMin));
+  const panel=document.getElementById('stockAlertPanel');
+  if(!panel) return;
+  if(!lowProds.length){panel.style.display='none';return}
+
+  panel.style.display='block';
+  panel.innerHTML=`<div class="stock-alert-card">
+    <div class="stock-alert-title" style="justify-content:space-between">
+      <span>⚠️ Stock bajo (${lowProds.length})</span>
+      <button onclick="document.getElementById('stockAlertPanel').style.display='none'" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px">✕</button>
+    </div>
+    ${lowProds.slice(0,5).map(p=>`<div class="stock-alert-item">
+      <span>${p.emoji||'📦'} ${p.nombre}</span>
+      <span style="font-family:var(--mono);color:${p.stock===0?'var(--danger)':'var(--warn)'};font-weight:700">${p.stock===0?'AGOTADO':p.stock+' uds'}</span>
+    </div>`).join('')}
+    ${lowProds.length>5?`<div style="font-size:11px;color:var(--text2);padding-top:6px">+${lowProds.length-5} más en inventario</div>`:''}
+  </div>`;
+
+  // Browser notification
+  if('Notification' in window&&Notification.permission==='granted'){
+    new Notification('Cherry POS — Stock bajo ⚠️',{
+      body:`${lowProds.length} producto(s) con stock bajo`,
+      icon:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍒</text></svg>"
+    });
+  } else if('Notification' in window&&Notification.permission!=='denied'){
+    Notification.requestPermission();
+  }
+}
+
+// ═══════════════════════ CALCULADORA C$ ↔ USD ════════════════
+function calcFromUSD(){
+  const usd=parseFloat(document.getElementById('calcUSD').value)||0;
+  const tasa=parseFloat(document.getElementById('tasaCambio').value)||36.5;
+  document.getElementById('calcNIO').value=usd>0?fmt(usd*tasa):'';
+  updateQuickConv();
+}
+function calcFromNIO(){
+  const nio=parseFloat(document.getElementById('calcNIO').value)||0;
+  const tasa=parseFloat(document.getElementById('tasaCambio').value)||36.5;
+  document.getElementById('calcUSD').value=nio>0?fmt(nio/tasa):'';
+  updateQuickConv();
+}
+function calcMoneda(){
+  const usd=parseFloat(document.getElementById('calcUSD').value)||0;
+  if(usd>0) calcFromUSD(); else calcFromNIO();
+  updateQuickConv();
+  S.cfg.tasaCambio=parseFloat(document.getElementById('tasaCambio').value)||36.5;
+  saveStorage();
+}
+function updateQuickConv(){
+  const tasa=parseFloat(document.getElementById('tasaCambio').value)||36.5;
+  const amounts=[1,5,10,20,50,100];
+  document.getElementById('quickConv').innerHTML=amounts.map(a=>
+    `<button class="quick-btn" onclick="document.getElementById('calcUSD').value=${a};calcFromUSD()">
+      $${a} = C$${fmt(a*tasa)}
+    </button>`).join('');
+}
+
+// ═══════════════════════ TICKET 80MM ═════════════════════════
+function showTicketModal(fac=null){
+  const f=fac||currentInvoice; if(!f) return;
+  document.getElementById('ticketPreview').innerHTML=buildTicket(f);
+  openModal('ticketModal');
+}
+function ticketFac(id){const f=S.facturas.find(x=>x.id===id);if(f){currentInvoice=f;showTicketModal(f)}}
+function buildTicket(f){
+  const c=S.cfg; const mc=c.moneda||'C$';
+  const line=(a,b)=>`<div class="ticket-row"><span>${a}</span><span>${b}</span></div>`;
+  const div='<div class="ticket-divider"></div>';
+  const items=f.items.map(i=>`
+    <div class="ticket-row"><span>${i.emoji||''} ${i.nombre}</span></div>
+    <div class="ticket-row"><span>  ${i.qty} x ${mc}${fmt(i.precio)}</span><span>${mc}${fmt(i.subtotal)}</span></div>`).join('');
+  return `<div class="ticket">
+    <div class="ticket-center">
+      ${c.logo?`<img src="${c.logo}" style="max-height:50px;max-width:120px;object-fit:contain;margin-bottom:6px"><br>`:'🍒<br>'}
+      <div class="ticket-bold" style="font-size:14px">${c.nombre||'Cherry POS'}</div>
+      ${c.rfc&&c.invShowRUC!==false?`<div>${c.rfc}</div>`:''}
+      ${c.dir?`<div>${c.dir}</div>`:''}
+      ${c.tel?`<div>${c.tel}</div>`:''}
+    </div>
+    ${div}
+    <div class="ticket-row"><span>Factura #${f.num}</span><span>${new Date(f.fecha).toLocaleDateString('es')}</span></div>
+    <div class="ticket-row"><span>Cliente:</span><span>${f.cliente||'Consumidor'}</span></div>
+    ${div}
+    ${items}
+    ${div}
+    ${line('Subtotal:',mc+fmt(f.sub))}
+    ${f.disc>0?line(`Desc. ${f.disc}%:`,'−'+mc+fmt(f.da)):''}
+    ${c.invShowIVA!==false?line(`IVA ${c.iva}%:`,mc+fmt(f.iva)):''}
+    <div class="ticket-total"><span>TOTAL</span><span>${mc}${fmt(f.tot)}</span></div>
+    ${f.pago&&c.invShowVuelto!==false?`${line('Recibido:',mc+fmt(f.pago))}${line('Vuelto:',mc+fmt(f.vuelto||0))}`:''}
+    ${div}
+    <div class="ticket-center" style="font-size:10px">${f.metodo} · ${new Date(f.fecha).toLocaleTimeString('es')}</div>
+    <div class="ticket-center" style="font-size:11px;margin-top:6px">${c.msg||'Gracias por su compra'}</div>
+    ${c.invFooter?`<div class="ticket-center" style="font-size:10px">${c.invFooter}</div>`:''}
+    <div class="ticket-center" style="font-size:9px;margin-top:8px;color:#666">🍒 Cherry v3.0 by berry</div>
+  </div>`;
+}
+function printTicket(){
+  const content=document.getElementById('ticketPreview').innerHTML;
+  const w=window.open('','_blank','width=400,height=600');
+  w.document.write(`<!DOCTYPE html><html><head><title>Ticket</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Courier New',monospace;width:80mm;padding:8px 4px}
+  .ticket-row{display:flex;justify-content:space-between;padding:2px 0;font-size:11.5px}
+  .ticket-total{display:flex;justify-content:space-between;font-size:14px;font-weight:bold;padding:4px 0;border-top:2px solid #111}
+  .ticket-center{text-align:center}.ticket-bold{font-weight:bold}.ticket-divider{border-top:1px dashed #999;margin:5px 0}
+  @media print{@page{margin:0;size:80mm auto}}</style></head>
+  <body>${content}</body></html>`);
+  w.document.close();w.focus();setTimeout(()=>w.print(),300);
+}
+
+// ═══════════════════════ INVOICE PREVIEW ═════════════════════
+function previewInvoice(){
+  // Create a dummy factura for preview
+  const dummy={id:'prev',num:'000001',cliente:'Cliente Ejemplo',
+    items:[{nombre:'Producto Ejemplo',emoji:'📦',precio:100,qty:2,subtotal:200}],
+    sub:200,disc:0,da:0,iva:200*(S.cfg.iva/100),tot:200*(1+S.cfg.iva/100),
+    metodo:'Efectivo',pago:300,vuelto:300-200*(1+S.cfg.iva/100),
+    nota:'',fecha:new Date().toISOString()};
+  currentInvoice=dummy;
+  showInvoiceModal(dummy);
+}
+
+// ═══════════════════════ COLOR SYNC ══════════════════════════
+function syncColorHex(){
+  const hex=document.getElementById('invColorHex').value;
+  if(/^#[0-9A-Fa-f]{6}$/.test(hex))document.getElementById('invColor').value=hex;
+}
+
+// ═══════════════════════ VENTAS POR HORA ═════════════════════
+function renderVentasPorHora(facs){
+  const mc=cur();
+  const horas=Array(24).fill(0);
+  const counts=Array(24).fill(0);
+  facs.forEach(f=>{
+    const h=new Date(f.fecha).getHours();
+    horas[h]+=f.tot; counts[h]++;
+  });
+  const maxH=Math.max(...horas,1);
+  const totalHoras=horas.reduce((s,v)=>s+v,0);
+  const peakHour=horas.indexOf(Math.max(...horas));
+
+  // Only show hours 6-22
+  const visHours=Array.from({length:17},(_, i)=>i+6);
+  const bars=visHours.map(h=>{
+    const pct=Math.round(horas[h]/maxH*75);
+    const isPeak=h===peakHour&&horas[h]>0;
+    return `<div class="hora-bar-col">
+      <div class="hora-bar" style="height:${Math.max(3,pct)}px;background:${isPeak?'linear-gradient(180deg,var(--warn),rgba(255,201,77,.5))':'linear-gradient(180deg,var(--cherry-glow),var(--cherry-deep))'}" data-tip="${String(h).padStart(2,'0')}:00 · ${counts[h]} ventas · ${mc}${fmt(horas[h])}"></div>
+      <div class="hora-lbl">${h}h</div>
+    </div>`;
+  }).join('');
+
+  const peakStr=peakHour>=0&&horas[peakHour]>0?`Hora pico: <strong>${String(peakHour).padStart(2,'0')}:00</strong> · ${mc}${fmt(horas[peakHour])}`:'Sin datos';
+  return `<div style="display:flex;align-items:flex-end;gap:2px;height:90px;overflow-x:auto;padding:0 2px" class="hora-chart">${bars}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:8px">⏰ ${peakStr}</div>`;
+}
 
 // ═══════════════════════ START ═══════════════════════════════
 init();
