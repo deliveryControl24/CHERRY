@@ -501,6 +501,13 @@ textarea.form-control { resize:vertical; min-height:80px; }
 .settings-item:last-child { border-bottom:none; }
 .settings-item-label { font-size:.875rem; font-weight:500; }
 .settings-item-desc { font-size:.75rem; color:var(--gray); margin-top:1px; }
+
+.color-swatch {
+  width:32px; height:32px; border-radius:50%; cursor:pointer;
+  border:3px solid transparent; transition:all 0.2s;
+}
+.color-swatch.active { border-color:var(--ink); transform:scale(1.15); }
+.color-swatch:hover { transform:scale(1.1); }
 </style>
 </head>
 <body>
@@ -884,6 +891,57 @@ textarea.form-control { resize:vertical; min-height:80px; }
             <div class="form-group"><label class="form-label">Correo Electrónico</label><input class="form-control" id="bizEmail" placeholder="negocio@email.com" oninput="saveBizConfig()"></div>
           </div>
         </div>
+
+        <!-- FACTURA PERSONALIZABLE -->
+        <div class="settings-section">
+          <div class="settings-section-title">🧾 Personalización de Facturas</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:20px">
+            <!-- Opciones -->
+            <div>
+              <div class="form-group"><label class="form-label">Número de RUC / Cédula</label><input class="form-control" id="facRuc" placeholder="J0000000000000" oninput="saveFacturaConfig()"></div>
+              <div class="form-group"><label class="form-label">Slogan / Subtítulo</label><input class="form-control" id="facSlogan" placeholder="Ej: Calidad y sabor garantizados" oninput="saveFacturaConfig()"></div>
+              <div class="form-group"><label class="form-label">Mensaje de Pie de Factura</label><textarea class="form-control" id="facFooter" placeholder="Ej: ¡Gracias por su compra! No se aceptan devoluciones después de 3 días." oninput="saveFacturaConfig()"></textarea></div>
+              <div class="form-group"><label class="form-label">Color de Encabezado</label>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px" id="colorPicker">
+                  <div class="color-swatch active" data-color="#C0392B" style="background:#C0392B" onclick="setFacColor('#C0392B',this)" title="Rojo Cereza"></div>
+                  <div class="color-swatch" data-color="#8E44AD" style="background:#8E44AD" onclick="setFacColor('#8E44AD',this)" title="Mora"></div>
+                  <div class="color-swatch" data-color="#1A5276" style="background:#1A5276" onclick="setFacColor('#1A5276',this)" title="Azul Marino"></div>
+                  <div class="color-swatch" data-color="#1E8449" style="background:#1E8449" onclick="setFacColor('#1E8449',this)" title="Verde"></div>
+                  <div class="color-swatch" data-color="#784212" style="background:#784212" onclick="setFacColor('#784212',this)" title="Café"></div>
+                  <div class="color-swatch" data-color="#1A1A2E" style="background:#1A1A2E" onclick="setFacColor('#1A1A2E',this)" title="Negro"></div>
+                  <input type="color" id="facColorCustom" oninput="setFacColor(this.value,null)" title="Color personalizado" style="width:32px;height:32px;border-radius:50%;border:2px solid var(--border);cursor:pointer;padding:2px">
+                </div>
+              </div>
+              <div style="margin-top:8px">
+                <div style="font-size:.8rem;font-weight:600;color:var(--ink-light);margin-bottom:8px;letter-spacing:.3px;text-transform:uppercase">Mostrar en factura:</div>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;font-size:.875rem">
+                  <input type="checkbox" id="facShowLogo" onchange="saveFacturaConfig()" style="accent-color:var(--cherry)"> Nombre del negocio como logo
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;font-size:.875rem">
+                  <input type="checkbox" id="facShowRuc" onchange="saveFacturaConfig()" style="accent-color:var(--cherry)"> RUC / Cédula
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;font-size:.875rem">
+                  <input type="checkbox" id="facShowPhone" onchange="saveFacturaConfig()" style="accent-color:var(--cherry)"> Teléfono
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;font-size:.875rem">
+                  <input type="checkbox" id="facShowAddress" onchange="saveFacturaConfig()" style="accent-color:var(--cherry)"> Dirección
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;font-size:.875rem">
+                  <input type="checkbox" id="facShowClient" onchange="saveFacturaConfig()" style="accent-color:var(--cherry)"> Datos del cliente
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.875rem">
+                  <input type="checkbox" id="facShowFooter" onchange="saveFacturaConfig()" style="accent-color:var(--cherry)"> Mensaje de pie
+                </label>
+              </div>
+            </div>
+            <!-- Preview -->
+            <div>
+              <div style="font-size:.75rem;font-weight:600;color:var(--ink-light);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px">Vista Previa</div>
+              <div id="facturaPreview" style="font-family:'DM Mono',monospace;font-size:.72rem;line-height:1.7;background:white;border-radius:12px;padding:16px;border:2px dashed var(--border);max-height:380px;overflow-y:auto"></div>
+            </div>
+          </div>
+        </div>
+
         <div class="settings-section">
           <div class="settings-section-title">🗑️ Zona de Peligro</div>
           <div class="settings-item">
@@ -1033,6 +1091,40 @@ textarea.form-control { resize:vertical; min-height:80px; }
 <!-- Toast container -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- Quick Stock Modal -->
+<div class="modal-overlay" id="modalStock">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <span class="modal-title">📦 Actualizar Stock</span>
+      <button class="modal-close" onclick="closeModal('modalStock')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="stockProdId">
+      <div style="text-align:center;margin-bottom:16px">
+        <div style="font-size:2.5rem" id="stockProdEmoji">📦</div>
+        <div style="font-weight:700;font-size:1rem;margin-top:4px" id="stockProdName">Producto</div>
+        <div style="color:var(--gray);font-size:.8rem;margin-top:2px">Stock actual: <span style="font-family:'DM Mono',monospace;font-weight:700;color:var(--cherry)" id="stockProdCurrent">0</span></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de ajuste</label>
+        <select class="form-control" id="stockTipo">
+          <option value="set">Establecer cantidad exacta</option>
+          <option value="add">Agregar unidades (entrada)</option>
+          <option value="sub">Quitar unidades (salida/ajuste)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cantidad</label>
+        <input class="form-control" id="stockCantidad" type="number" min="0" placeholder="0" style="font-size:1.2rem;text-align:center;font-family:'DM Mono',monospace">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-secondary" style="flex:1" onclick="closeModal('modalStock')">Cancelar</button>
+        <button class="btn btn-primary" style="flex:1" onclick="applyStockUpdate()">✓ Aplicar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ============ STATE ============
 let state = {
@@ -1117,7 +1209,7 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 
 // ============ REFRESH ============
 function refreshPage(page) {
-  const r = {dashboard:renderDashboard,pos:()=>{renderPOSProducts();renderCartClientSelect();},ventas:renderVentas,gastos:renderGastos,inventario:renderInventario,clientes:renderClientes,deudas:renderDeudas,reportes:()=>renderReportes(reportPeriod),configuracion:loadBizConfig};
+  const r = {dashboard:renderDashboard,pos:()=>{renderPOSProducts();renderCartClientSelect();},ventas:renderVentas,gastos:renderGastos,inventario:renderInventario,clientes:renderClientes,deudas:renderDeudas,reportes:()=>renderReportes(reportPeriod),configuracion:()=>{loadBizConfig();loadFacturaConfig();}};
   (r[page]||function(){})();
 }
 
@@ -1299,23 +1391,35 @@ function processSale() {
 
 function showReceipt(v) {
   const biz = state.config;
+  const fc = state.facturaConfig || {};
+  const color = fc.color || '#C0392B';
+  const showLogo = fc.showLogo !== false;
+  const showRuc = fc.showRuc && fc.ruc;
+  const showPhone = fc.showPhone !== false;
+  const showAddress = fc.showAddress !== false;
+  const showClient = fc.showClient !== false;
+  const showFooter = fc.showFooter !== false && fc.footer;
+  const slogan = fc.slogan || '';
   const itemsHtml = v.items.map(i=>`<div class="receipt-row"><span>${i.emoji} ${i.nombre} x${i.qty}</span><span>${fmtC(i.precio*i.qty)}</span></div>`).join('');
   document.getElementById('receiptContent').innerHTML = `
-    <div class="receipt-header">
-      <div class="receipt-logo">${biz.bizName||'Cherry & Berry'}</div>
-      ${biz.bizAddress?`<div style="font-size:.7rem;margin-top:2px">${biz.bizAddress}</div>`:''}
-      ${biz.bizPhone?`<div style="font-size:.7rem">Tel: ${biz.bizPhone}</div>`:''}
-      <div style="font-size:.7rem;margin-top:4px">${fmtDate(v.timestamp)} ${fmtTime(v.timestamp)}</div>
-      <div style="font-size:.7rem"># ${v.id.slice(-6).toUpperCase()}</div>
+    <div class="receipt-header" style="background:${color};color:#fff;margin:-16px -16px 12px;padding:16px;border-radius:10px 10px 0 0">
+      ${showLogo?`<div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900">${biz.bizName||'Cherry & Berry'}</div>`:''}
+      ${slogan?`<div style="font-size:.72rem;opacity:0.85;margin-top:2px">${slogan}</div>`:''}
+      ${showRuc?`<div style="font-size:.68rem;opacity:0.75">RUC: ${fc.ruc}</div>`:''}
+      ${showAddress&&biz.bizAddress?`<div style="font-size:.68rem;opacity:0.75">${biz.bizAddress}</div>`:''}
+      ${showPhone&&biz.bizPhone?`<div style="font-size:.68rem;opacity:0.75">Tel: ${biz.bizPhone}</div>`:''}
+    </div>
+    <div style="font-size:.7rem;margin-bottom:8px">
+      <div style="display:flex;justify-content:space-between"><span>Fecha:</span><span>${fmtDate(v.timestamp)} ${fmtTime(v.timestamp)}</span></div>
+      <div style="display:flex;justify-content:space-between"><span>Factura #:</span><span>${v.id.slice(-6).toUpperCase()}</span></div>
     </div>
     <hr class="receipt-divider">
-    ${v.clienteNombre?`<div class="receipt-row"><span>Cliente:</span><span>${v.clienteNombre}</span></div><hr class="receipt-divider">`:''}
+    ${showClient&&v.clienteNombre?`<div style="font-size:.72rem;margin-bottom:8px"><strong>Cliente:</strong> ${v.clienteNombre}</div><hr class="receipt-divider">`:''}
     ${itemsHtml}
     <hr class="receipt-divider">
-    <div class="receipt-row receipt-total"><span>TOTAL</span><span>${fmtC(v.total)}</span></div>
-    <div class="receipt-row" style="margin-top:4px;font-size:.75rem"><span>Pago:</span><span>${v.metodoPago.toUpperCase()}</span></div>
-    <hr class="receipt-divider">
-    <div style="text-align:center;font-size:.72rem;opacity:0.6">¡Gracias por su compra!</div>`;
+    <div class="receipt-row receipt-total" style="color:${color}"><span>TOTAL</span><span>${fmtC(v.total)}</span></div>
+    <div class="receipt-row" style="margin-top:4px;font-size:.75rem"><span>Método de pago:</span><span>${v.metodoPago.toUpperCase()}</span></div>
+    ${showFooter?`<hr class="receipt-divider"><div style="text-align:center;font-size:.7rem;color:${color};font-style:italic">${fc.footer}</div>`:'<hr class="receipt-divider"><div style="text-align:center;font-size:.7rem;opacity:0.5">¡Gracias por su compra!</div>'}`;
   openModal('modalRecibo');
 }
 
@@ -1478,7 +1582,8 @@ function renderInventario() {
       <td style="font-family:'DM Mono',monospace;font-weight:600;${p.stock===0?'color:#E74C3C':p.stock<=p.minStock?'color:var(--warning)':''}">${p.stock}</td>
       <td>${stockStatus}</td>
       <td>
-        <button class="btn btn-secondary btn-sm" onclick="editProducto('${p.id}')">✏️</button>
+        <button class="btn btn-secondary btn-sm" onclick="openStockModal('${p.id}')" title="Actualizar stock">📦 Stock</button>
+        <button class="btn btn-secondary btn-sm" onclick="editProducto('${p.id}')" style="margin-left:4px">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="deleteProducto('${p.id}')" style="margin-left:4px">🗑</button>
       </td></tr>`;}).join('') : '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray)">Sin productos</td></tr>';
 }
@@ -1677,9 +1782,112 @@ function clearAllData() {
   saveState(); toast('Datos eliminados','warning','⚠️'); renderDashboard();
 }
 
+// ============ QUICK STOCK ============
+function openStockModal(id) {
+  const p = state.productos.find(x=>x.id===id); if(!p) return;
+  document.getElementById('stockProdId').value = id;
+  document.getElementById('stockProdEmoji').textContent = p.emoji||'📦';
+  document.getElementById('stockProdName').textContent = p.nombre;
+  document.getElementById('stockProdCurrent').textContent = p.stock;
+  document.getElementById('stockCantidad').value = '';
+  document.getElementById('stockTipo').value = 'set';
+  openModal('modalStock');
+}
+
+function applyStockUpdate() {
+  const id = document.getElementById('stockProdId').value;
+  const tipo = document.getElementById('stockTipo').value;
+  const cant = parseInt(document.getElementById('stockCantidad').value);
+  if(isNaN(cant)||cant<0){toast('Ingresa una cantidad válida','error','✕');return;}
+  const p = state.productos.find(x=>x.id===id); if(!p) return;
+  const prev = p.stock;
+  if(tipo==='set') p.stock=cant;
+  else if(tipo==='add') p.stock+=cant;
+  else if(tipo==='sub') p.stock=Math.max(0,p.stock-cant);
+  saveState(); closeModal('modalStock'); renderInventario(); renderPOSProducts();
+  toast(`Stock actualizado: ${prev} → ${p.stock}`,'success','📦');
+}
+
+// ============ FACTURA CONFIG ============
+function saveFacturaConfig() {
+  if(!state.facturaConfig) state.facturaConfig={};
+  const fc = state.facturaConfig;
+  fc.ruc = document.getElementById('facRuc')?.value||'';
+  fc.slogan = document.getElementById('facSlogan')?.value||'';
+  fc.footer = document.getElementById('facFooter')?.value||'';
+  fc.showLogo = document.getElementById('facShowLogo')?.checked!==false;
+  fc.showRuc = document.getElementById('facShowRuc')?.checked||false;
+  fc.showPhone = document.getElementById('facShowPhone')?.checked!==false;
+  fc.showAddress = document.getElementById('facShowAddress')?.checked!==false;
+  fc.showClient = document.getElementById('facShowClient')?.checked!==false;
+  fc.showFooter = document.getElementById('facShowFooter')?.checked||false;
+  localStorage.setItem('cb_facturaConfig', JSON.stringify(fc));
+  updateFacturaPreview();
+}
+
+function setFacColor(color, el) {
+  if(!state.facturaConfig) state.facturaConfig={};
+  state.facturaConfig.color = color;
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('active'));
+  if(el) el.classList.add('active');
+  localStorage.setItem('cb_facturaConfig', JSON.stringify(state.facturaConfig));
+  updateFacturaPreview();
+}
+
+function updateFacturaPreview() {
+  const biz = state.config;
+  const fc = state.facturaConfig||{};
+  const color = fc.color||'#C0392B';
+  const preview = document.getElementById('facturaPreview');
+  if(!preview) return;
+  preview.innerHTML = `
+    <div style="background:${color};color:#fff;margin:-1px -1px 10px;padding:12px;border-radius:6px 6px 0 0;text-align:center">
+      <div style="font-size:1rem;font-weight:900;font-family:'Playfair Display',serif">${biz.bizName||'Mi Negocio'}</div>
+      ${fc.slogan?`<div style="font-size:.68rem;opacity:0.85">${fc.slogan}</div>`:''}
+      ${fc.showRuc&&fc.ruc?`<div style="font-size:.65rem;opacity:0.75">RUC: ${fc.ruc}</div>`:''}
+      ${fc.showAddress!==false&&biz.bizAddress?`<div style="font-size:.65rem;opacity:0.75">${biz.bizAddress}</div>`:''}
+      ${fc.showPhone!==false&&biz.bizPhone?`<div style="font-size:.65rem;opacity:0.75">Tel: ${biz.bizPhone}</div>`:''}
+    </div>
+    <div style="font-size:.7rem;margin-bottom:6px;display:flex;justify-content:space-between"><span>Fecha:</span><span>${new Date().toLocaleDateString('es-NI')}</span></div>
+    <div style="font-size:.7rem;margin-bottom:8px;display:flex;justify-content:space-between"><span>Factura #:</span><span>ABCDEF</span></div>
+    <hr style="border:none;border-top:1px dashed #ccc;margin:6px 0">
+    ${fc.showClient!==false?`<div style="font-size:.7rem;margin-bottom:6px"><strong>Cliente:</strong> Juan Pérez</div><hr style="border:none;border-top:1px dashed #ccc;margin:6px 0">`:''}
+    <div style="font-size:.7rem;display:flex;justify-content:space-between;margin-bottom:3px"><span>🛒 Producto x2</span><span>C$50.00</span></div>
+    <div style="font-size:.7rem;display:flex;justify-content:space-between"><span>🎁 Otro item x1</span><span>C$30.00</span></div>
+    <hr style="border:none;border-top:1px dashed #ccc;margin:6px 0">
+    <div style="display:flex;justify-content:space-between;font-weight:700;color:${color};font-size:.85rem"><span>TOTAL</span><span>C$80.00</span></div>
+    ${fc.showFooter&&fc.footer?`<hr style="border:none;border-top:1px dashed #ccc;margin:6px 0"><div style="text-align:center;font-size:.68rem;color:${color};font-style:italic">${fc.footer}</div>`:'<div style="text-align:center;font-size:.68rem;opacity:0.5;margin-top:6px">¡Gracias por su compra!</div>'}`;
+}
+
+function loadFacturaConfig() {
+  const saved = localStorage.getItem('cb_facturaConfig');
+  if(saved) state.facturaConfig = JSON.parse(saved);
+  const fc = state.facturaConfig||{};
+  const setVal = (id,val)=>{ const el=document.getElementById(id); if(el) el.value=val||''; };
+  const setChk = (id,val)=>{ const el=document.getElementById(id); if(el) el.checked=val!==false; };
+  setVal('facRuc', fc.ruc);
+  setVal('facSlogan', fc.slogan);
+  setVal('facFooter', fc.footer);
+  setChk('facShowLogo', fc.showLogo);
+  setChk('facShowRuc', fc.showRuc||false);
+  setChk('facShowPhone', fc.showPhone);
+  setChk('facShowAddress', fc.showAddress);
+  setChk('facShowClient', fc.showClient);
+  setChk('facShowFooter', fc.showFooter||false);
+  const color = fc.color||'#C0392B';
+  document.querySelectorAll('.color-swatch').forEach(s=>{
+    s.classList.toggle('active', s.dataset.color===color);
+  });
+  const ci = document.getElementById('facColorCustom');
+  if(ci) ci.value = color;
+  updateFacturaPreview();
+}
+
 // ============ INIT ============
 function init() {
   loadState();
+  const saved = localStorage.getItem('cb_facturaConfig');
+  if(saved) state.facturaConfig = JSON.parse(saved);
   updateDeudasBadge();
   const bizName = state.config.bizName||'Cherry & Berry';
   document.getElementById('bizNameSidebar').textContent=bizName;
